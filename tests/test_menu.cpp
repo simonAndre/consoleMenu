@@ -2,29 +2,13 @@
 #include "consoleMenu.h"
 using namespace std;
 
-class MemberMenusTester
-{
-private:
-    int _intvalue;
-    string _cstringvalue;
+bool initIntValue();
+bool initStringValue();
+bool DisplayStringValue();
+bool menu1();
+bool menu2();
 
-public:
-    MemberMenusTester(/* args */);
-    bool initIntValue();
-    bool initCstringValue();
-};
-
-bool menu1()
-{
-    cout << "menu1 called\n";
-    return true;
-}
-bool menu2()
-{
-    cout << "menu2 called\n";
-    return true;
-}
-
+/*****  stdio functions ********/
 void DisplayInfos(const char *infos)
 {
     cout << infos;
@@ -37,19 +21,23 @@ const char *WaitInput()
     return input.c_str();
 }
 
+/***********   main   ******************/
 int main()
 {
     cout << "starting test consoleMenu\n";
+
     MenuOptions menuoptions;
     menuoptions.addBack = true;
-    menuoptions.addBack = false;
+    menuoptions.addExitForEachLevel = true;
     consoleMenu m(DisplayInfos, WaitInput, menuoptions);
-    ushort menu1id = m.addMenuitem("menu 1", menu1, 0);
-    ushort menu2id = m.addMenuitem("menu 2", menu2, 0);
-    ushort menu3id = m.addMenuitem("menu 3", NULL, 0);
-    m.addMenuitem("menu 3-1", menu1, menu3id);
-    m.addMenuitem("menu 3-2", menu2, menu3id);
-    ushort menu33id = m.addMenuitem("menu 3-3", NULL, menu3id);
+    m.addMenuitem("menu 1", menu1, 0);
+    m.addMenuitem("menu 2", menu2, 0);
+    ushort menu3id = m.addMenuitem("sous-menu 3", NULL, 0);
+    m.addMenuitem("init string and stay", initStringValue, menu3id);
+    m.addMenuitem("display string and stay", DisplayStringValue, menu3id);
+    m.addMenuitem("menu init int and stop", initIntValue, menu3id);
+
+    ushort menu33id = m.addMenuitem("sous-menu 3-3", NULL, menu3id);
     m.addMenuitem("menu 3-3-1", menu1, menu33id);
     m.addMenuitem("menu 3-3-2", menu2, menu33id);
 
@@ -58,7 +46,21 @@ int main()
     return 0;
 }
 
-bool MemberMenusTester::initIntValue()
+/********* menus callbacks ***********/
+
+bool menu1()
+{
+    cout << "menu1 called\n";
+    return true;
+}
+bool menu2()
+{
+    cout << "menu2 called\n";
+    return true;
+}
+
+int _intvalue;
+bool initIntValue()
 {
     cout << "enter an int value:";
     try
@@ -72,7 +74,8 @@ bool MemberMenusTester::initIntValue()
     }
     return true;
 }
-bool MemberMenusTester::initCstringValue()
+string _cstringvalue("-");
+bool initStringValue()
 {
     cout << "enter an string value:";
     try
@@ -82,7 +85,11 @@ bool MemberMenusTester::initCstringValue()
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
-        return false;
     }
-    return true;
+    return false;
+}
+bool DisplayStringValue()
+{
+    cout << "string content : " << _cstringvalue << '\n';
+    return false;
 }

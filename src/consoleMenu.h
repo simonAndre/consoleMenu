@@ -1,10 +1,10 @@
 
 #include <map>
 #include <string>
-
-typedef bool (*pf_menu)(void);
-typedef void (*pf_display)(const char *);
-typedef const char *(*pf_input)(void);
+// callback called on menu selection. if the return value is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
+typedef bool (*pf_callback)(void);
+typedef void (*pf_IOdisplay)(const char *);
+typedef const char *(*pf_IOinput)(void);
 typedef unsigned short ushort;
 
 typedef struct
@@ -20,37 +20,39 @@ class consoleMenu
 private:
     enum menutype
     {
-        externalFunction,
-        hierarchymenu,
-        exit,
-        back
+        externalFunction = 0,
+        exit = 1, //exit the menu
+        back = 2, //back to the parent menuitem
+        hierarchymenu = 3
     };
 
     class Menuitem
     {
     private:
     public:
-        Menuitem(const char *menuname, ushort id, ushort parentid, pf_menu menuFonction, consoleMenu::menutype type);
+        Menuitem(const char *menuname, ushort id, ushort parentid, pf_callback menuFonction, consoleMenu::menutype type);
         ushort mid;
         ushort mparentid = 0;
         std::string mname;
         consoleMenu::menutype mtype;
-        pf_menu mFonction;
+        pf_callback mFonction;
     };
 
     std::map<ushort, Menuitem> _menuCollection;
-    ushort getHierarchyCollectionCardinality(ushort hierarchyid);
-    ushort _hierarchyIx = 0; // current hierarchy
-    pf_display _displayCallback;
-    pf_input _inputCallback;
+    pf_IOdisplay _displayCallback;
+    pf_IOinput _inputCallback;
     MenuOptions _menuoptions;
+    bool _isMenuCollectionComplete = false;
+    // insert common specials menuitems displayed before the regular MI.
+    void
+    insertSpecialsMI();
+    // append common specials menuitems displayed after the regular MI.
+    void appendSpecialsMI();
+    void displayMenu(short hierarchyId, short lasthierachyid);
 
 public:
-    consoleMenu(pf_display displayCallback, pf_input inputCallback, MenuOptions options);
-    ushort addMenuitem(const char *menuname, pf_menu menuFonction, ushort parentid);
+    consoleMenu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options);
+    ushort addMenuitem(const char *menuname, pf_callback menuFonction, ushort parentid);
     // get the string (as a char array) to display the menu for the current hierarchy
     void displayMenu();
-    // perform the selection for the menu item;
-    // return true if successfull (otherwise, bad input, prompt again in the outside loop).
-    bool Selection(short menuitemid);
 };
