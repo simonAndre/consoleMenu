@@ -14,7 +14,7 @@ void DisplayInfos(const char *infos)
     cout << infos;
 }
 
-const char *WaitInput()
+const char *WaitforInput()
 {
     string input;
     cin >> input;
@@ -24,23 +24,34 @@ const char *WaitInput()
 /***********   main   ******************/
 int main()
 {
-    cout << "starting test consoleMenu\n";
+    cout << "\n\n";
 
+    //define options
     MenuOptions menuoptions;
     menuoptions.addBack = true;
     menuoptions.addExitForEachLevel = true;
-    consoleMenu m(DisplayInfos, WaitInput, menuoptions);
+
+    // declaration,
+    // DisplayInfos: IO callback to render the menu
+    // WaitforInput: IO callback to wait and read the user input
+    consoleMenu m(DisplayInfos, WaitforInput, menuoptions);
+
+    // menus & submenus definition
+    // root menus
     m.addMenuitem("action 1", menu1, 0);
     m.addMenuitem("action 2", menu2, 0);
     ushort menu3id = m.addMenuitem("sous-menu 3", NULL, 0);
+    // level 2 menus, under the item [menu3id]
     m.addMenuitem("init string and stay", initStringValue, menu3id);
     m.addMenuitem("display string and stay", DisplayStringValue, menu3id);
     m.addMenuitem("menu init int and stop", initIntValue, menu3id);
 
+    // more levels can be chained...
     ushort menu33id = m.addMenuitem("sous-menu 3-3", NULL, menu3id);
     m.addMenuitem("menu 3-3-1", menu1, menu33id);
     m.addMenuitem("menu 3-3-2", menu2, menu33id);
 
+    //and display the root menu
     m.displayMenu();
 
     return 0;

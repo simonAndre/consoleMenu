@@ -1,5 +1,15 @@
-consolemenu: ./src/*
-	g++ -pg ./src/*.cpp -shared -o ./lib/consoleMenu.so
-test: ./tests/*.cpp
-	g++ -pg ./tests/*.cpp -L./lib -l:consoleMenu.so -I./src -o ./test.exe
-	cp ./test.exe ./tests/test_menu.exe
+CC=g++
+CXXFLAGS=-g  #-W -Wall
+LDFLAGS= -L./lib/
+EXEC=exemple
+
+all: exemple
+
+consoleMenu.so: ./src/*
+	$(CC) -o ./lib/consoleMenu.so ./src/*.cpp -shared  $(CXXFLAGS)
+
+$(EXEC): ./exemples/*.cpp ./src/*.cpp
+	$(CC) -o ./$(EXEC) ./src/*.cpp ./exemples/*.cpp $(LDFLAGS) -I./src $(CXXFLAGS)
+
+clean: 
+	rm ./lib/consoleMenu.so  ./$(EXEC)
