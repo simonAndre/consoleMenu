@@ -71,3 +71,7 @@ simply use displayMenu();
 m.displayMenu();
 ```
 this call will exit when the user make his choice and the callback give the control back to the main program flow. 
+
+## Licence
+
+This code is released under the MIT License.
