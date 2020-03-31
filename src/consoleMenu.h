@@ -1,8 +1,11 @@
 
 #include <map>
 #include <string>
-// callback called on menu selection. if the return value is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
-typedef bool (*pf_callback)(void);
+// callback called on menu selection.
+// if the return value is true : exit the menu after execution of this function,
+// else stay in the current menu and wait for another action
+// callback param will be the menuitem name
+typedef bool (*pf_callback)(const char *);
 typedef void (*pf_IOdisplay)(const char *);
 typedef const char *(*pf_IOinput)(void);
 typedef unsigned short ushort;

@@ -2,11 +2,11 @@
 #include "consoleMenu.h"
 using namespace std;
 
-bool initIntValue();
-bool initStringValue();
-bool DisplayStringValue();
-bool menu1();
-bool menu2();
+bool initIntValue(const char *menuname);
+bool initStringValue(const char *menuname);
+bool DisplayStringValue(const char *menuname);
+bool menu1(const char *menuname);
+bool menu2(const char *menuname);
 
 /*****  stdio functions ********/
 void DisplayInfos(const char *infos)
@@ -30,8 +30,8 @@ int main()
     menuoptions.addBack = true;
     menuoptions.addExitForEachLevel = true;
     consoleMenu m(DisplayInfos, WaitInput, menuoptions);
-    m.addMenuitem("menu 1", menu1, 0);
-    m.addMenuitem("menu 2", menu2, 0);
+    m.addMenuitem("action 1", menu1, 0);
+    m.addMenuitem("action 2", menu2, 0);
     ushort menu3id = m.addMenuitem("sous-menu 3", NULL, 0);
     m.addMenuitem("init string and stay", initStringValue, menu3id);
     m.addMenuitem("display string and stay", DisplayStringValue, menu3id);
@@ -48,19 +48,19 @@ int main()
 
 /********* menus callbacks ***********/
 
-bool menu1()
+bool menu1(const char *menuname)
 {
-    cout << "menu1 called\n";
+    cout << "callback menu1 called from " << menuname << '\n';
     return true;
 }
-bool menu2()
+bool menu2(const char *menuname)
 {
-    cout << "menu2 called\n";
+    cout << "callback menu1 called from " << menuname << '\n';
     return true;
 }
 
 int _intvalue;
-bool initIntValue()
+bool initIntValue(const char *menuname)
 {
     cout << "enter an int value:";
     try
@@ -75,7 +75,7 @@ bool initIntValue()
     return true;
 }
 string _cstringvalue("-");
-bool initStringValue()
+bool initStringValue(const char *menuname)
 {
     cout << "enter an string value:";
     try
@@ -88,7 +88,7 @@ bool initStringValue()
     }
     return false;
 }
-bool DisplayStringValue()
+bool DisplayStringValue(const char *menuname)
 {
     cout << "string content : " << _cstringvalue << '\n';
     return false;

@@ -132,7 +132,7 @@ void consoleMenu::displayMenu(short hierarchyId, short lasthierachyid)
                 case consoleMenu::menutype::externalFunction:
                     //call the menu function
                     // if not successfull, prompt again in the outside loop.
-                    done = mi.mFonction();
+                    done = mi.mFonction(mi.mname.c_str());
                     break;
                 default:
                     break;
