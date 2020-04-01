@@ -1,10 +1,17 @@
 
 #include <map>
 #include <string>
-// callback called on menu selection.
-// if the return value is true : exit the menu after execution of this function,
-// else stay in the current menu and wait for another action
-// callback param will be the menuitem name
+
+namespace consoleMenu
+{
+
+/**
+ * @brief callback called on menu selection.
+ * 
+ * @param callback param will be the menuitem name
+ * @return if the return value is true : exit the menu after execution of this function,
+ * else stay in the current menu and wait for another action
+ */
 typedef bool (*pf_callback)(const char *);
 typedef void (*pf_IOdisplay)(const char *);
 typedef const char *(*pf_IOinput)(void);
@@ -17,8 +24,33 @@ typedef struct
     const char *id_separator = " - ";
 } MenuOptions;
 
-class consoleMenu
+class Menu
 {
+public:
+    /**
+ * @brief Construct a new console Menu object
+ * 
+ * @param displayCallback function displaying the menu to the user from the complete char array
+ * @param inputCallback function waiting the user input
+ * @param options initialization options
+ */
+    Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options);
+
+    /**
+     * @brief add an item to the menu, part of the menu setting to be done before calling displayMenu
+     * 
+     * @param menuname 
+     * @param menuFonction 
+     * @param parentid 
+     * @return ushort 
+     */
+    ushort addMenuitem(const char *menuname, pf_callback menuFonction, ushort parentid);
+
+    /**
+     * @brief  get the string (as a char array) to display the menu for the current hierarchy
+     * 
+     */
+    void displayMenu();
 
 private:
     enum menutype
@@ -33,11 +65,11 @@ private:
     {
     private:
     public:
-        Menuitem(const char *menuname, ushort id, ushort parentid, pf_callback menuFonction, consoleMenu::menutype type);
+        Menuitem(const char *menuname, ushort id, ushort parentid, pf_callback menuFonction, Menu::menutype type);
         ushort mid;
         ushort mparentid = 0;
         std::string mname;
-        consoleMenu::menutype mtype;
+        Menu::menutype mtype;
         pf_callback mFonction;
     };
 
@@ -52,10 +84,5 @@ private:
     // append common specials menuitems displayed after the regular MI.
     void appendSpecialsMI();
     void displayMenu(short hierarchyId, short lasthierachyid);
-
-public:
-    consoleMenu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options);
-    ushort addMenuitem(const char *menuname, pf_callback menuFonction, ushort parentid);
-    // get the string (as a char array) to display the menu for the current hierarchy
-    void displayMenu();
 };
+} // namespace consoleMenu

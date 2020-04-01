@@ -1,6 +1,8 @@
 #include <iostream>
 #include "consoleMenu.h"
+
 using namespace std;
+using namespace consoleMenu;
 
 bool initIntValue(const char *menuname);
 bool initStringValue(const char *menuname);
@@ -34,11 +36,11 @@ int main()
     // declaration,
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
-    consoleMenu m(DisplayInfos, WaitforInput, menuoptions);
+    Menu m(DisplayInfos, WaitforInput, menuoptions);
 
     // menus & submenus definition
     // root menus
-    m.addMenuitem("action 1", menu1, 0);
+    m.addMenuitem("build infos", menu1, 0);
     m.addMenuitem("action 2", menu2, 0);
     ushort menu3id = m.addMenuitem("sous-menu 3", NULL, 0);
     // level 2 menus, under the item [menu3id]
@@ -48,7 +50,7 @@ int main()
 
     // more levels can be chained...
     ushort menu33id = m.addMenuitem("sous-menu 3-3", NULL, menu3id);
-    m.addMenuitem("menu 3-3-1", menu1, menu33id);
+    m.addMenuitem("menu 3-3-1 (build infos)", menu1, menu33id);
     m.addMenuitem("menu 3-3-2", menu2, menu33id);
 
     //and display the root menu
@@ -61,7 +63,11 @@ int main()
 
 bool menu1(const char *menuname)
 {
-    cout << "callback menu1 called from " << menuname << '\n';
+    cout << "__GNUG__ : " << __GNUG__ << '\n';
+    cout << "__cplusplus : " << __cplusplus << '\n';
+    cout << "build time : " << __TIMESTAMP__ << '\n';
+    cout
+        << "callback menu1 called from " << menuname << '\n';
     return true;
 }
 bool menu2(const char *menuname)
