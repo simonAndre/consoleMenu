@@ -41,13 +41,18 @@ void Menu::appendSpecialsMI()
 
     _isMenuCollectionComplete = true;
 }
-
+// Menu::Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback)
+// {
+//     _displayCallback = displayCallback;
+//     _inputCallback = inputCallback;
+//     // insert special menu entry for internal use:
+//     insertSpecialsMI();
+// }
 Menu::Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options)
 {
     _displayCallback = displayCallback;
     _inputCallback = inputCallback;
     _menuoptions = options;
-
     // insert special menu entry for internal use:
     insertSpecialsMI();
 }

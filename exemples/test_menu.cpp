@@ -23,21 +23,13 @@ const char *WaitforInput()
     return input.c_str();
 }
 
-/***********   main   ******************/
-int main()
+Menu m = Menu(DisplayInfos, WaitforInput, (MenuOptions){true, true});
+
+void SetupMenu()
 {
-    cout << "\n\n";
-
-    //define options
-    MenuOptions menuoptions;
-    menuoptions.addBack = true;
-    menuoptions.addExitForEachLevel = true;
-
     // declaration,
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
-    Menu m(DisplayInfos, WaitforInput, menuoptions);
-
     // menus & submenus definition
     // root menus
     m.addMenuitem("build infos", menu1, 0);
@@ -52,8 +44,15 @@ int main()
     ushort menu33id = m.addMenuitem("sous-menu 3-3", NULL, menu3id);
     m.addMenuitem("menu 3-3-1 (build infos)", menu1, menu33id);
     m.addMenuitem("menu 3-3-2", menu2, menu33id);
+}
 
-    //and display the root menu
+/***********   main   ******************/
+int main()
+{
+    cout << "\n\n";
+    SetupMenu();
+
+    // display the root menu
     m.displayMenu();
 
     return 0;
