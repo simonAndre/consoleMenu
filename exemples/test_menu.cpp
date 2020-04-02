@@ -1,8 +1,8 @@
 #include <iostream>
-#include "consoleMenu.h"
+#include <consoleMenu.h>
 
 using namespace std;
-using namespace consoleMenu;
+// using namespace consoleMenu;
 
 bool initIntValue(const char *menuname);
 bool initStringValue(const char *menuname);
