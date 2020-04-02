@@ -1,6 +1,4 @@
 #pragma once
-#include <consoleMenu/Namespace.hpp>
-#include <commontypes.hpp>
 
 namespace CONSOLEMENU_NAMESPACE
 {

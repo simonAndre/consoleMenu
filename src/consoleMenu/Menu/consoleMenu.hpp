@@ -1,6 +1,7 @@
 
 #pragma once
-#include <consoleMenu/Menu/Menuitem.hpp>
+
+// #include "Menuitem.hpp"
 #include <exception>
 #include <iterator> // std::iterator, std::input_iterator_tag
 #include <map>
@@ -151,7 +152,14 @@ private:
                  (_menuoptions.addExitForEachLevel || (_menuoptions.addBack && hierarchyId == 0))) // condition for exit Menu
             )
             {
-                display.append(std::to_string(++ix)).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
+                ix++;
+#if CONSOLEMENU_EMBEDDED_MODE
+                char buff[4];
+                sprintf(buff, "%i", ix);
+                display.append(buff).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
+#else
+                display.append(std::to_string(ix)).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
+#endif
                 menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
             }
             if (lasthierachyid == RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId)
@@ -168,7 +176,12 @@ private:
             try
             {
                 ushort inputi = USHRT_MAX;
+#if CONSOLEMENU_EMBEDDED_MODE
+                inputi = (ushort)atoi(input);
+#else
                 inputi = std::stoi(input);
+#endif
+
                 menuitemid = menuitems.at(inputi);
                 std::map<ushort, Menuitem>::iterator it2 = _menuCollection.find(menuitemid);
                 if (it2 != _menuCollection.end())

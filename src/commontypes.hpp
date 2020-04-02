@@ -1,5 +1,5 @@
 #pragma once
-#include <consoleMenu/Namespace.hpp>
+// #include <consoleMenu/Namespace.hpp>
 
 namespace CONSOLEMENU_NAMESPACE
 {

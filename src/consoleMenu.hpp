@@ -13,9 +13,14 @@
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
 // #pragma message(STRING(__cplusplus))
-// #pragma message("consolemenu namespace:" STRING(CONSOLEMENU_NAMESPACE))
 
+#include "consoleMenu/Namespace.hpp"
+#include "commontypes.hpp"
+#include "consoleMenu/Menu/types.hpp"
+#include "consoleMenu/Menu/Menuitem.hpp"
 #include "consoleMenu/Menu/consoleMenu.hpp"
+
+// #pragma message("consolemenu EMBEDDED_MODE:" STRING(CONSOLEMENU_EMBEDDED_MODE))
 
 namespace consoleMenu
 {
