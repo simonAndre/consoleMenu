@@ -1,7 +1,6 @@
+#pragma once
 #include <consoleMenu/Namespace.hpp>
 #include <commontypes.hpp>
-#include <map>
-#include <string>
 
 namespace CONSOLEMENU_NAMESPACE
 {
@@ -23,4 +22,13 @@ typedef struct
     bool addExitForEachLevel = true; //if false and addBack is true : the exist menuitem is only available at the root
     const char *id_separator = " - ";
 } MenuOptions;
+
+enum menutype
+{
+    externalFunction = 0,
+    exit = 1, //exit the menu
+    back = 2, //back to the parent menuitem
+    hierarchymenu = 3
+};
+
 } // namespace CONSOLEMENU_NAMESPACE

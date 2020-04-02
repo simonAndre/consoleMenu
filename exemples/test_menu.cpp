@@ -2,7 +2,6 @@
 #include <consoleMenu.h>
 
 using namespace std;
-// using namespace consoleMenu;
 
 bool initIntValue(const char *menuname);
 bool initStringValue(const char *menuname);
@@ -23,7 +22,8 @@ const char *WaitforInput()
     return input.c_str();
 }
 
-Menu m = Menu(DisplayInfos, WaitforInput, (MenuOptions){true, true});
+// Menu m = Menu(DisplayInfos, WaitforInput, (MenuOptions){true, true});
+Menu m = Menu(DisplayInfos, WaitforInput);
 
 void SetupMenu()
 {
@@ -32,6 +32,11 @@ void SetupMenu()
     // WaitforInput: IO callback to wait and read the user input
     // menus & submenus definition
     // root menus
+    MenuOptions mo;
+    mo.addBack = true;
+    mo.addExitForEachLevel = true;
+    m.setOptions(mo);
+
     m.addMenuitem("build infos", menu1, 0);
     m.addMenuitem("action 2", menu2, 0);
     ushort menu3id = m.addMenuitem("sous-menu 3", NULL, 0);
