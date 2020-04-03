@@ -23,15 +23,34 @@ work on a callback basis : each call to a memnu item is link to a simple callbac
 
 example of the definition of a 3 level hierarchical menu:
 ### setup : 
-```c
-    //define options
+
+#### the easy way 
+```C++
+#include <consoleMenu.h>
+Menu consolemenu = Menu();
+   // menus & submenus definition
+    // root menus
+    m.addMenuitem("action 1", menu1, 0);
+    m.addMenuitem("action 2", menu2, 0);
+  // ... (see below for more examples)
+```
+
+#### the complete way
+
+```C++
+    // include the library
+    #include <consoleMenu.h>
+   
+   
+    //optional : define options
     MenuOptions menuoptions;
     menuoptions.addBack = true;
     menuoptions.addExitForEachLevel = true;
 
     // declaration,
-    // DisplayInfos: IO callback to render the menu
-    // WaitforInput: IO callback to wait and read the user input
+    // DisplayInfos: IO callback to render the menu : optional, a default callback is provided within the library
+    // WaitforInput: IO callback to wait and read the user input : optional, a default callback is provided within the library
+    // menuoptions : opional : can also be called after the initialization with the Menu::setOptions method
     consoleMenu m(DisplayInfos, WaitforInput, menuoptions);
 
     // menus & submenus definition
@@ -52,10 +71,27 @@ example of the definition of a 3 level hierarchical menu:
     //and display the root menu
     m.displayMenu();
 ```
+
+### call the menu to render 
+simply use Menu::displayMenu() this call will exit when the user make his choice and the callback give the control back to the main program flow. 
+
+#### method 1 
+suitable on a computer or in a specific embedded method):
+
+```C++
+    m.displayMenu();
+```
+#### method 2
+in a process loop (for exemple : the loop() arduino method):
+```C++
+     consolemenu.LoopCheckSerial();
+```
+
+
 ### callbacks
 simple function based on this prototype. :
 
-```c
+```C++
 bool menu1(const char *menuname);
 ```
 + parameters :
@@ -64,13 +100,6 @@ bool menu1(const char *menuname);
 
 + return value :  if the return value from the callback is true, the menu is exited after execution of this function. Otherwise, we stay in the current menu and wait for another action.
 
-###  menu call
-simply use displayMenu();
-
-```c
-m.displayMenu();
-```
-this call will exit when the user make his choice and the callback give the control back to the main program flow. 
 
 ## Licence
 
