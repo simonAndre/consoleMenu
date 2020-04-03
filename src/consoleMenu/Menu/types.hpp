@@ -13,6 +13,7 @@ namespace CONSOLEMENU_NAMESPACE
 typedef bool (*pf_callback)(const char *);
 typedef void (*pf_IOdisplay)(const char *);
 typedef const char *(*pf_IOinput)(void);
+typedef ushort (*pf_IOinputId)(void);
 
 typedef struct
 {

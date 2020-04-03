@@ -1,6 +1,5 @@
 #include <iostream>
 #include <consoleMenu.h>
-
 using namespace std;
 
 bool initIntValue(const char *menuname);
@@ -21,9 +20,15 @@ const char *WaitforInput()
     cin >> input;
     return input.c_str();
 }
+ushort WaitforInput2()
+{
+    ushort input;
+    cin >> input;
+    return input;
+}
 
-// Menu m = Menu(DisplayInfos, WaitforInput, (MenuOptions){true, true});
-Menu m = Menu(DisplayInfos, WaitforInput);
+Menu m = Menu();
+// Menu m = Menu(DisplayInfos, WaitforInput);
 
 void SetupMenu()
 {
