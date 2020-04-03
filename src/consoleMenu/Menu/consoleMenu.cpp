@@ -1,9 +1,8 @@
+#pragma once
+
 #include <exception>
 #include <iterator> // std::iterator, std::input_iterator_tag
-#include "consoleMenu.h"
-
-using namespace std;
-using namespace consoleMenu;
+#include <consoleMenu/Menu/consoleMenu.hpp>
 
 #define PARENTID_FORSPECIALMENU 9999
 #define RECOMPUTEPARENT 9999
@@ -14,50 +13,58 @@ using namespace consoleMenu;
 /*
 * @menuname
 */
-Menu::Menuitem::Menuitem(const char *menuname, ushort id, ushort parentid, pf_callback menuFonction, Menu::menutype type)
+CONSOLEMENU_NAMESPACE::Menu::Menuitem::Menuitem(const char *menuname, ushort id, ushort parentid, pf_callback menuFonction, CONSOLEMENU_NAMESPACE::Menu::menutype type)
 {
     mid = id;
     mparentid = parentid;
-    mname = string(menuname);
+    mname = std::string(menuname);
     mFonction = menuFonction;
     mtype = type;
 }
 
 // insert common specials menuitems displayed before the regular MI.
-void Menu::insertSpecialsMI()
+void CONSOLEMENU_NAMESPACE::Menu::insertSpecialsMI()
 {
-    _menuCollection.insert(pair<ushort, Menuitem>(
+    _menuCollection.insert(std::pair<ushort, Menuitem>(
         1,
-        Menuitem("< back", 1, PARENTID_FORSPECIALMENU, NULL, Menu::menutype::back)));
+        Menuitem("< back", 1, PARENTID_FORSPECIALMENU, NULL, CONSOLEMENU_NAMESPACE::Menu::menutype::back)));
 }
 // append common specials menuitems displayed after the regular MI.
-void Menu::appendSpecialsMI()
+void CONSOLEMENU_NAMESPACE::Menu::appendSpecialsMI()
 {
     ushort itemid = _menuCollection.size();
     itemid++;
-    _menuCollection.insert(pair<ushort, Menuitem>(
+    _menuCollection.insert(std::pair<ushort, Menuitem>(
         itemid,
-        Menuitem("> exit", itemid, PARENTID_FORSPECIALMENU, NULL, Menu::menutype::exit)));
+        Menuitem("> exit", itemid, PARENTID_FORSPECIALMENU, NULL, CONSOLEMENU_NAMESPACE::Menu::menutype::exit)));
 
     _isMenuCollectionComplete = true;
 }
-
-Menu::Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options)
+CONSOLEMENU_NAMESPACE::Menu::Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback)
+{
+    _displayCallback = displayCallback;
+    _inputCallback = inputCallback;
+    // insert special menu entry for internal use:
+    insertSpecialsMI();
+}
+CONSOLEMENU_NAMESPACE::Menu::Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options)
 {
     _displayCallback = displayCallback;
     _inputCallback = inputCallback;
     _menuoptions = options;
-
     // insert special menu entry for internal use:
     insertSpecialsMI();
 }
-
+void CONSOLEMENU_NAMESPACE::Menu::setOptions(MenuOptions options)
+{
+    _menuoptions = options;
+}
 // Add a menu item
 // menuname : name
 // parentid : for a submenu : id of the parent item.
 // menuFonction : pointeur to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
 // return : menuid
-ushort Menu::addMenuitem(const char *menuname, pf_callback menuFonction, ushort parentid)
+ushort CONSOLEMENU_NAMESPACE::Menu::addMenuitem(const char *menuname, pf_callback menuFonction, ushort parentid)
 {
     if (parentid > 0)
     {
@@ -66,27 +73,27 @@ ushort Menu::addMenuitem(const char *menuname, pf_callback menuFonction, ushort 
     }
     ushort itemid = _menuCollection.size() + 1;
     if (menuFonction == NULL)
-        _menuCollection.insert(pair<ushort, Menuitem>(
+        _menuCollection.insert(std::pair<ushort, Menuitem>(
             itemid,
-            Menuitem(menuname, itemid, parentid, NULL, Menu::menutype::hierarchymenu)));
+            Menuitem(menuname, itemid, parentid, NULL, CONSOLEMENU_NAMESPACE::Menu::menutype::hierarchymenu)));
     else
-        _menuCollection.insert(pair<ushort, Menuitem>(
+        _menuCollection.insert(std::pair<ushort, Menuitem>(
             itemid,
-            Menuitem(menuname, itemid, parentid, menuFonction, Menu::menutype::externalFunction)));
+            Menuitem(menuname, itemid, parentid, menuFonction, CONSOLEMENU_NAMESPACE::Menu::menutype::externalFunction)));
 
     return itemid;
 }
-void Menu::displayMenu()
+void CONSOLEMENU_NAMESPACE::Menu::displayMenu()
 {
     displayMenu(0, 0);
 }
 
 //for internal recursive calls
-void Menu::displayMenu(short hierarchyId, short lasthierachyid)
+void CONSOLEMENU_NAMESPACE::Menu::displayMenu(short hierarchyId, short lasthierachyid)
 {
-    string display("");
+    std::string display("");
     ushort ix = 0;
-    map<ushort, Menu::Menuitem>::iterator it;
+    map<ushort, CONSOLEMENU_NAMESPACE::Menu::Menuitem>::iterator it;
     map<ushort, ushort> menuitems;
 
     if (!_isMenuCollectionComplete)
@@ -96,16 +103,16 @@ void Menu::displayMenu(short hierarchyId, short lasthierachyid)
     for (it = _menuCollection.begin(); it != _menuCollection.end(); ++it)
     {
         if (it->second.mparentid == hierarchyId ||
-            (it->second.mtype == Menu::menutype::back &&                                       // condition for back Menu
+            (it->second.mtype == CONSOLEMENU_NAMESPACE::Menu::menutype::back &&                // condition for back Menu
              _menuoptions.addBack && hierarchyId > 0) ||                                       // condition for back Menu
-            (it->second.mtype == Menu::menutype::exit &&                                       // condition for exit Menu
+            (it->second.mtype == CONSOLEMENU_NAMESPACE::Menu::menutype::exit &&                // condition for exit Menu
              (_menuoptions.addExitForEachLevel || (_menuoptions.addBack && hierarchyId == 0))) // condition for exit Menu
         )
         {
-            display.append(to_string(++ix)).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
-            menuitems.insert(pair<ushort, ushort>(ix, it->second.mid));
+            display.append(std::to_string(++ix)).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
+            menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
         }
-        if (lasthierachyid == RECOMPUTEPARENT && it->second.mtype == Menu::menutype::hierarchymenu && it->first == hierarchyId)
+        if (lasthierachyid == RECOMPUTEPARENT && it->second.mtype == CONSOLEMENU_NAMESPACE::Menu::menutype::hierarchymenu && it->first == hierarchyId)
             lasthierachyid = it->second.mparentid;
     }
 
@@ -121,23 +128,23 @@ void Menu::displayMenu(short hierarchyId, short lasthierachyid)
             ushort inputi = USHRT_MAX;
             inputi = stoi(input);
             menuitemid = menuitems.at(inputi);
-            map<ushort, Menu::Menuitem>::iterator it2 = _menuCollection.find(menuitemid);
+            map<ushort, CONSOLEMENU_NAMESPACE::Menu::Menuitem>::iterator it2 = _menuCollection.find(menuitemid);
             if (it2 != _menuCollection.end())
             {
                 Menuitem mi = it2->second;
 
                 switch (mi.mtype)
                 {
-                case Menu::menutype::hierarchymenu:
+                case CONSOLEMENU_NAMESPACE::Menu::menutype::hierarchymenu:
                     //recursive call to display the underlying menu
                     displayMenu(it2->first, hierarchyId);
                     return;
-                case Menu::menutype::back:
+                case CONSOLEMENU_NAMESPACE::Menu::menutype::back:
                     displayMenu(lasthierachyid, RECOMPUTEPARENT);
                     return;
-                case Menu::menutype::exit:
+                case CONSOLEMENU_NAMESPACE::Menu::menutype::exit:
                     return;
-                case Menu::menutype::externalFunction:
+                case CONSOLEMENU_NAMESPACE::Menu::menutype::externalFunction:
                     //call the menu function
                     // if not successfull, prompt again in the outside loop.
                     done = mi.mFonction(mi.mname.c_str());
