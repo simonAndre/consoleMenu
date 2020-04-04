@@ -6,9 +6,6 @@
 #include <iterator> // std::iterator, std::input_iterator_tag
 #include <map>
 #include <string>
-#if CONSOLEMENU_EMBEDDED_MODE
-#include <Arduino.h>
-#endif
 
 #define PARENTID_FORSPECIALMENU 9999
 #define RECOMPUTEPARENT 9999
@@ -29,16 +26,14 @@ public:
     {
         _displayCallback = displayCallback;
         _inputCallback = inputCallback;
-        // insert special menu entry for internal use:
-        insertSpecialsMI();
+        internalInit();
     }
 
     Menu(pf_IOdisplay displayCallback, pf_IOinputId inputId)
     {
         _displayCallback = displayCallback;
         _inputId = inputId;
-        // insert special menu entry for internal use:
-        insertSpecialsMI();
+        internalInit();
     }
 
     /**
@@ -47,10 +42,9 @@ public:
      */
     Menu()
     {
-        _displayCallback = displayInfosDefaultCallback;
-        _inputId = waitforInputIntDefaultCallback;
-        // insert special menu entry for internal use:
-        insertSpecialsMI();
+        _displayCallback = IOcallbacks::displayInfosDefaultCallback;
+        _inputId = IOcallbacks::waitforInputIntDefaultCallback;
+        internalInit();
     }
     /**
  * @brief Construct a new console Menu object with options specified
@@ -115,27 +109,28 @@ public:
         displayMenu(0, 0);
     }
 
-#if CONSOLEMENU_EMBEDDED_MODE
     /**
      * @brief to call in the main loop : listen to an input from the serial UI and react displaying the root menu
      * this method can be implemnted in your code, in this case, call Menu::displayMenu() when you want to display the root menu.
+     * currently only implemented for arduino
      */
     void LoopCheckSerial()
     {
+#if CONSOLEMENU_EMBEDDED_MODE
         if (!this->_isserialmenuative && Serial.available() > 0)
         {
             Serial.flush();
             // enter serial menu:
             this->_isserialmenuative = true;
-            this->displayMenu();
+            fp_displaymenu();
             /**
          * while displaying console menu, the process loop on the user input, it is a sync process TODO : make it async
          */
             // Serial.println("menu exited");
             this->_isserialmenuative = false;
         }
-    }
 #endif
+    }
 
 private:
     std::map<ushort, Menuitem> _menuCollection;
@@ -147,6 +142,13 @@ private:
 #if CONSOLEMENU_EMBEDDED_MODE
     bool _isserialmenuative = false;
 #endif
+
+    void
+    internalInit()
+    {
+        // insert special menu entry for internal use:
+        insertSpecialsMI();
+    }
 
     /**
      * @brief insert common specials menuitems displayed before the regular MI.
@@ -277,46 +279,5 @@ private:
             }
         } while (!done);
     }
-
-    static void displayInfosDefaultCallback(const char *infos)
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        Serial.print(infos);
-#else
-        std::cout << infos;
-#endif
-    }
-
-    const char *WaitforInput()
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-// used waitforInputIntDefaultCallback instead
-#else
-        std::string input;
-        std::cin >> input;
-        return input.c_str();
-#endif
-    }
-    static ushort waitforInputIntDefaultCallback()
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        bool inputdone = false;
-        do
-        {
-            if (Serial.available() > 0)
-            {
-                String provinput = Serial.readString();
-                char c = provinput.charAt(0);
-                return c - 48;
-            }
-            delay(50);
-        } while (!inputdone);
-#else
-        ushort input;
-        std::cin >> input;
-        return input;
-#endif
-    }
 };
-
 } // namespace CONSOLEMENU_NAMESPACE

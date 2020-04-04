@@ -18,7 +18,12 @@
 #include "commontypes.hpp"
 #include "consoleMenu/Menu/types.hpp"
 #include "consoleMenu/Menu/Menuitem.hpp"
+#include "consoleMenu/Menu/IOcallbacks.hpp"
 #include "consoleMenu/Menu/consoleMenu.hpp"
+
+#if CONSOLEMENU_EMBEDDED_MODE
+#include <Arduino.h>
+#endif
 
 // #pragma message("consolemenu EMBEDDED_MODE:" STRING(CONSOLEMENU_EMBEDDED_MODE))
 
