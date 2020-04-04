@@ -19,7 +19,7 @@
 #include "consoleMenu/Menu/types.hpp"
 #include "consoleMenu/Menu/Menuitem.hpp"
 #include "consoleMenu/Menu/IOcallbacks.hpp"
-#include "consoleMenu/Menu/consoleMenu.hpp"
+#include "consoleMenu/Menu/Menu.hpp"
 
 #if CONSOLEMENU_EMBEDDED_MODE
 #include <Arduino.h>
@@ -29,9 +29,6 @@
 
 namespace consoleMenu
 {
-// using CONSOLEMENU_NAMESPACE::fp_callback;
-// using CONSOLEMENU_NAMESPACE::fp_IOdisplay;
-// using CONSOLEMENU_NAMESPACE::fp_IOinput;
 using CONSOLEMENU_NAMESPACE::Menu;
 using CONSOLEMENU_NAMESPACE::MenuOptions;
 using CONSOLEMENU_NAMESPACE::ushort;

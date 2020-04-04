@@ -7,6 +7,7 @@ void setupSerialMenu();
 bool initIntValue(const char *menuname);
 bool initStringValue(const char *menuname);
 bool DisplayStringValue(const char *menuname);
+bool DisplayIntValue();
 bool simpleMenu();
 bool buildInfos();
 bool menuParamName(const char *menuname);
@@ -50,9 +51,10 @@ void setupSerialMenu()
     consolemenu.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
     ushort submenu1id = consolemenu.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
-    consolemenu.addCallbackMenuitem("init string and stay", initStringValue, submenu1id);
+    consolemenu.addCallbackMenuitem("set string", initStringValue, submenu1id);
     consolemenu.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1id);
-    consolemenu.addCallbackMenuitem("menu init int and stop", initIntValue, submenu1id);
+    consolemenu.addCallbackMenuitem("set int value", initIntValue, submenu1id);
+    consolemenu.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1id);
     //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
     consolemenu.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1id, (ushort)MyMenuKeys::switchmenu1);
 
@@ -100,7 +102,7 @@ bool initIntValue(const char *menuname)
         Serial.print("bad input, try again");
         return false;
     }
-    return true;
+    return false;
 }
 
 String _stringvalue("-");
@@ -117,7 +119,12 @@ bool DisplayStringValue(const char *menuname)
     Serial.println(_stringvalue);
     return false;
 }
-
+bool DisplayIntValue()
+{
+    Serial.print("int value : ");
+    Serial.println(_intvalue);
+    return true;
+}
 bool _switchmenuValue1 = false;
 bool _switchmenuValue2 = false;
 bool switchMenu(ushort menukey, const char *menuname)
@@ -168,6 +175,7 @@ String takeUserInput()
         if (Serial.available() > 0)
         {
             String provinput = Serial.readString();
+            Serial.println();
             return provinput;
         }
         delay(50);
