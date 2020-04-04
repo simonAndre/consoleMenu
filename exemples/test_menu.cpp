@@ -5,7 +5,8 @@ using namespace std;
 //prototypes
 bool initIntValue(const char *menuname);
 bool initStringValue(const char *menuname);
-bool DisplayStringValue(const char *menuname);
+bool DisplayStringValue();
+bool DisplayIntValue();
 bool simpleMenu();
 bool buildInfos();
 bool menuParamName(const char *menuname);
@@ -56,9 +57,10 @@ void SetupMenu()
     m.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
     ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
-    m.addCallbackMenuitem("init string and stay", initStringValue, submenu1id);
+    m.addCallbackMenuitem("set string", initStringValue, submenu1id);
     m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1id);
-    m.addCallbackMenuitem("menu init int and stop", initIntValue, submenu1id);
+    m.addCallbackMenuitem("set int value", initIntValue, submenu1id);
+    m.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1id);
     //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
     m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1id, (ushort)MyMenuKeys::switchmenu1);
 
@@ -118,7 +120,7 @@ bool initIntValue(const char *menuname)
         std::cerr << e.what() << '\n';
         return false;
     }
-    return true;
+    return false;
 }
 string _cstringvalue("-");
 bool initStringValue(const char *menuname)
@@ -134,12 +136,16 @@ bool initStringValue(const char *menuname)
     }
     return false;
 }
-bool DisplayStringValue(const char *menuname)
+bool DisplayStringValue()
 {
     cout << "string content : " << _cstringvalue << '\n';
     return false;
 }
-
+bool DisplayIntValue()
+{
+    cout << "int value : " << _intvalue << '\n';
+    return true;
+}
 bool _switchmenuValue1 = false;
 bool _switchmenuValue2 = false;
 bool switchMenu(ushort menukey, const char *menuname)

@@ -370,9 +370,14 @@ private:
                     case menutype::externalFunction:
                         _displayCallback("\n");
                         done = callMenuCallbackFunction(mi);
-                        if (mi.mNamingFonction != NULL)
+                        if (!done && mi.mNamingFonction != NULL)
+                        {
                             //recursive call to display again the menu and reload the menu display callback
                             displayMenu(hierarchyId, lasthierachyid);
+                            return;
+                        }
+                        if (done)
+                            _displayCallback(">exited\n");
                         break;
                     default:
                         break;
