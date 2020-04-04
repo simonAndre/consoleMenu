@@ -29,10 +29,10 @@
 
 namespace consoleMenu
 {
+// using CONSOLEMENU_NAMESPACE::fp_callback;
+// using CONSOLEMENU_NAMESPACE::fp_IOdisplay;
+// using CONSOLEMENU_NAMESPACE::fp_IOinput;
 using CONSOLEMENU_NAMESPACE::Menu;
 using CONSOLEMENU_NAMESPACE::MenuOptions;
-using CONSOLEMENU_NAMESPACE::pf_callback;
-using CONSOLEMENU_NAMESPACE::pf_IOdisplay;
-using CONSOLEMENU_NAMESPACE::pf_IOinput;
 using CONSOLEMENU_NAMESPACE::ushort;
 } // namespace consoleMenu

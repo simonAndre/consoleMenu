@@ -6,9 +6,11 @@
 #include <iterator> // std::iterator, std::input_iterator_tag
 #include <map>
 #include <string>
+#include <string.h>
 
-#define PARENTID_FORSPECIALMENU 9999
-#define RECOMPUTEPARENT 9999
+#define CONSOLEMENU_PARENTID_FORSPECIALMENU 9999
+#define CONSOLEMENU_RECOMPUTEPARENT 9999
+#define CONSOLEMENU_NOMENUKEY 9999
 
 namespace CONSOLEMENU_NAMESPACE
 {
@@ -22,14 +24,14 @@ public:
  * 
  */
 
-    Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback)
+    Menu(fp_IOdisplay displayCallback, fp_IOinput inputCallback)
     {
         _displayCallback = displayCallback;
         _inputCallback = inputCallback;
         internalInit();
     }
 
-    Menu(pf_IOdisplay displayCallback, pf_IOinputId inputId)
+    Menu(fp_IOdisplay displayCallback, fp_IOinputId inputId)
     {
         _displayCallback = displayCallback;
         _inputId = inputId;
@@ -53,7 +55,7 @@ public:
  * @param inputCallback function waiting the user input
  * @param options initialization options
  */
-    Menu(pf_IOdisplay displayCallback, pf_IOinput inputCallback, MenuOptions options)
+    Menu(fp_IOdisplay displayCallback, fp_IOinput inputCallback, MenuOptions options)
     {
         _displayCallback = displayCallback;
         _inputCallback = inputCallback;
@@ -63,31 +65,87 @@ public:
     }
 
     /**
-     * @brief add an item to the menu, part of the menu setting to be done before calling displayMenu
+     * @brief add an item heading to a submenu, 
+     * part of the menu setting to be done before calling displayMenu
      * 
      * @param menuname 
-     * @param menuFonction : pointeur to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
-     * @param parentid : for a submenu : id of the parent item.
-     * @return ushort : menuid created, to reference on the submenu if this menu is supposed to be a hierarchy menu
+     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @return ushort : menuid created, to reference on the submenu items to setup underneath
      */
-    ushort addMenuitem(const char *menuname, pf_callback menuFonction, ushort parentid)
+    ushort addHierarchyMenuitem(const char *menuname, ushort parentid)
     {
-        if (parentid > 0)
-        {
-            if (_menuCollection.find(parentid) == _menuCollection.end())
-                throw std::runtime_error("no menu item are already declared in the menuitem collection for this id");
-        }
-        ushort itemid = _menuCollection.size() + 1;
-        if (menuFonction == NULL)
-            _menuCollection.insert(std::pair<ushort, Menuitem>(
-                itemid,
-                Menuitem(menuname, itemid, parentid, NULL, menutype::hierarchymenu)));
-        else
-            _menuCollection.insert(std::pair<ushort, Menuitem>(
-                itemid,
-                Menuitem(menuname, itemid, parentid, menuFonction, menutype::externalFunction)));
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::hierarchymenu, CONSOLEMENU_NOMENUKEY);
+        return newmenuitem.mid;
+    }
 
-        return itemid;
+    /**
+     * @brief add a menu item calling a given function.
+     * part of the menu setting to be done before calling displayMenu
+     * 
+     * @param menuname 
+     * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
+     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @return ushort : menuid created
+     */
+    ushort addCallbackMenuitem(const char *menuname, fp_callback1 menuFonction, ushort parentid)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetCallback(menuFonction);
+        return newmenuitem.mid;
+    }
+
+    /**
+     * @brief add a menu item calling a given function.
+     * part of the menu setting to be done before calling displayMenu
+     * 
+     * @param menuname 
+     * @param menuFonction : pointer to the function to call for this menu. if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
+     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @return ushort : menuid created
+     */
+    ushort addCallbackMenuitem(const char *menuname, fp_callback2 menuFonction, ushort parentid)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetCallback(menuFonction);
+        return newmenuitem.mid;
+    }
+    /**
+     * @brief add a menu item calling a given function. This overload let you use a menu key to uniquely identify your menu and treat it specially in your callback. 
+     * It can be a mean to group several callbacks into on function.
+     * part of the menu setting to be done before calling displayMenu
+     * 
+     * @param menuname 
+     * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
+     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @param menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique).
+     * this key is passed back to the callback
+     * @return ushort : menuid created
+     */
+    ushort addCallbackMenuitem(const char *menuname, fp_callback3 menuFonction, ushort parentid, ushort menukey)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::externalFunction, menukey);
+        _menuCollection.at(newmenuitem.mid).SetCallback(menuFonction);
+        newmenuitem.SetCallback(menuFonction);
+        return newmenuitem.mid;
+    }
+
+    /**
+     * @brief add a menu item calling a given function. This overload let you use a menu key to uniquely identify your menu and treat it specially in your callback. 
+     * It can be a mean to group several callbacks into on function.
+     * part of the menu setting to be done before calling displayMenu
+     * 
+     * @param menunamefunction : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
+     * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
+     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @param menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique).
+     * @return ushort : menuid created
+     */
+    ushort addDynamicCallbackMenuitem(fp_namingcallback menunamefunction, fp_callback3 menuFonction, ushort parentid, ushort menukey)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal("", parentid, menutype::externalFunction, menukey);
+        _menuCollection.at(newmenuitem.mid).SetCallback(menuFonction);
+        _menuCollection.at(newmenuitem.mid).SetNamingCallback(menunamefunction);
+        return newmenuitem.mid;
     }
 
     /**
@@ -122,7 +180,7 @@ public:
             Serial.flush();
             // enter serial menu:
             this->_isserialmenuative = true;
-            fp_displaymenu();
+            displayMenu();
             /**
          * while displaying console menu, the process loop on the user input, it is a sync process TODO : make it async
          */
@@ -134,9 +192,10 @@ public:
 
 private:
     std::map<ushort, Menuitem> _menuCollection;
-    pf_IOdisplay _displayCallback;
-    pf_IOinput _inputCallback;
-    pf_IOinputId _inputId;
+    std::map<ushort, ushort> _menukeys; // dictionary of menykeys:menuid
+    fp_IOdisplay _displayCallback;
+    fp_IOinput _inputCallback;
+    fp_IOinputId _inputId;
     MenuOptions _menuoptions;
     bool _isMenuCollectionComplete = false;
 #if CONSOLEMENU_EMBEDDED_MODE
@@ -150,6 +209,37 @@ private:
         insertSpecialsMI();
     }
 
+    Menuitem addMenuitem_internal(const char *menuname, ushort parentid, menutype mtype, ushort menukey)
+    {
+        if (parentid > 0)
+        {
+            if (_menuCollection.find(parentid) == _menuCollection.end())
+            {
+                char err[50];
+                sprintf(err, "Parent Linking error : no menu item found in the menuitem collection with id %i", parentid);
+                throw std::runtime_error(err);
+            }
+        }
+        ushort itemid = _menuCollection.size() + 1;
+        Menuitem newmenuitem(menuname, itemid, parentid, mtype);
+        newmenuitem.mkey = menukey;
+        if (menukey != CONSOLEMENU_NOMENUKEY)
+        {
+            if (_menukeys.find(menukey) != _menukeys.end())
+            {
+                char err[50];
+                sprintf(err, "a menuitem was already declared in the menuitem collection with ther key {}", menukey);
+                throw std::runtime_error(err);
+            }
+            _menukeys[menukey] = itemid;
+        }
+        _menuCollection.insert(std::pair<ushort, Menuitem>(
+            itemid,
+            newmenuitem));
+
+        return _menuCollection.at(itemid);
+    }
+
     /**
      * @brief insert common specials menuitems displayed before the regular MI.
      * 
@@ -158,7 +248,7 @@ private:
     {
         _menuCollection.insert(std::pair<ushort, Menuitem>(
             1,
-            Menuitem("< back", 1, PARENTID_FORSPECIALMENU, NULL, menutype::back)));
+            Menuitem("< back", 1, CONSOLEMENU_PARENTID_FORSPECIALMENU, menutype::back)));
     }
 
     /**
@@ -171,7 +261,7 @@ private:
         itemid++;
         _menuCollection.insert(std::pair<ushort, Menuitem>(
             itemid,
-            Menuitem("> exit", itemid, PARENTID_FORSPECIALMENU, NULL, menutype::exit)));
+            Menuitem("> exit", itemid, CONSOLEMENU_PARENTID_FORSPECIALMENU, menutype::exit)));
 
         _isMenuCollectionComplete = true;
     }
@@ -204,16 +294,28 @@ private:
             )
             {
                 ix++;
+
+                std::string menuname;
+                if (it->second.mNamingFonction != NULL)
+                {
+                    menuname = it->second.mNamingFonction(it->second.mkey);
+                    it->second.mname = menuname;
+                }
+                else
+                {
+                    menuname = it->second.mname;
+                }
+
 #if CONSOLEMENU_EMBEDDED_MODE
                 char buff[4];
                 sprintf(buff, "%i", ix);
-                display.append(buff).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
+                display.append(buff).append(_menuoptions.id_separator).append(menuname).append("\n");
 #else
-                display.append(std::to_string(ix)).append(_menuoptions.id_separator).append(it->second.mname).append("\n");
+                display.append(std::to_string(ix)).append(_menuoptions.id_separator).append(menuname).append("\n");
 #endif
                 menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
             }
-            if (lasthierachyid == RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId)
+            if (lasthierachyid == CONSOLEMENU_RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId)
                 lasthierachyid = it->second.mparentid;
         }
 
@@ -239,9 +341,12 @@ private:
                     inputi = std::stoi(input);
 #endif
                 }
+#if CONSOLEMENU_EMBEDDED_MODE
+                // on a computer with screen, the input is already displayed
                 char strbuff[3];
                 sprintf(strbuff, "%i", inputi);
                 _displayCallback(strbuff);
+#endif
                 menuitemid = menuitems.at(inputi);
                 std::map<ushort, Menuitem>::iterator it2 = _menuCollection.find(menuitemid);
                 if (it2 != _menuCollection.end())
@@ -257,16 +362,17 @@ private:
                         return;
                     case menutype::back:
                         _displayCallback("\n");
-                        displayMenu(lasthierachyid, RECOMPUTEPARENT);
+                        displayMenu(lasthierachyid, CONSOLEMENU_RECOMPUTEPARENT);
                         return;
                     case menutype::exit:
                         _displayCallback(">exited\n");
                         return;
                     case menutype::externalFunction:
                         _displayCallback("\n");
-                        //call the menu function
-                        // if not successfull, prompt again in the outside loop.
-                        done = mi.mFonction(mi.mname.c_str());
+                        done = callMenuCallbackFunction(mi);
+                        if (mi.mNamingFonction != NULL)
+                            //recursive call to display again the menu and reload the menu display callback
+                            displayMenu(hierarchyId, lasthierachyid);
                         break;
                     default:
                         break;
@@ -278,6 +384,24 @@ private:
                 continue;
             }
         } while (!done);
+    }
+
+    /**
+ * @brief call the menu function
+ * 
+ * @param mi 
+ * @return true if call was successfull (return bool from the callback).
+ * if not successfull, prompt again in the outside loop. 
+ */
+    bool callMenuCallbackFunction(Menuitem mi)
+    {
+        if (mi.mFonction_form3 != NULL)
+            return mi.mFonction_form3(mi.mkey, mi.mname.c_str());
+        if (mi.mFonction_form2 != NULL)
+            return mi.mFonction_form2(mi.mname.c_str());
+        if (mi.mFonction_form1 != NULL)
+            return mi.mFonction_form1();
+        return false;
     }
 };
 } // namespace CONSOLEMENU_NAMESPACE
