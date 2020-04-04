@@ -8,8 +8,8 @@ all: exemple
 consoleMenu.so: ./src/*
 	$(CC) -o ./lib/consoleMenu.so ./src/*.cpp -shared  $(CXXFLAGS)
 
-$(EXEC): ./exemples/*.cpp ./src/*.cpp
-	$(CC) -o ./$(EXEC) ./src/*.cpp ./exemples/*.cpp $(LDFLAGS) -I./src $(CXXFLAGS)
+$(EXEC): ./exemples/*.cpp
+	$(CC) -o ./$(EXEC) ./exemples/*.cpp $(LDFLAGS) -I./src $(CXXFLAGS)
 
 clean: 
 	rm ./lib/consoleMenu.so  ./$(EXEC)

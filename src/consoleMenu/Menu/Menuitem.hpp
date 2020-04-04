@@ -6,6 +6,16 @@ class Menuitem
 {
 private:
 public:
+    ushort mid;
+    ushort mparentid = 0;
+    ushort mkey = 0; //optional
+    std::string mname;
+    menutype mtype;
+    fp_callback1 mFonction_form1 = NULL;
+    fp_callback2 mFonction_form2 = NULL;
+    fp_callback3 mFonction_form3 = NULL;
+    fp_namingcallback *mNamingFonction = NULL;
+
     /**
  * @brief Construct a new Menuitem object
  * 
@@ -15,19 +25,29 @@ public:
  * @param menuFonction 
  * @param type 
  */
-    Menuitem(const char *menuname, ushort id, ushort parentid, pf_callback menuFonction, menutype type)
+    Menuitem(const char *menuname, ushort id, ushort parentid, menutype type)
     {
         mid = id;
         mparentid = parentid;
         mname = std::string(menuname);
-        mFonction = menuFonction;
         mtype = type;
     }
 
-    ushort mid;
-    ushort mparentid = 0;
-    std::string mname;
-    menutype mtype;
-    pf_callback mFonction;
+    void SetCallback(fp_callback1 menuFonction)
+    {
+        mFonction_form1 = menuFonction;
+    }
+    void SetCallback(fp_callback2 menuFonction)
+    {
+        mFonction_form2 = menuFonction;
+    }
+    void SetCallback(fp_callback3 menuFonction)
+    {
+        mFonction_form3 = menuFonction;
+    }
+    void SetNamingCallback(fp_namingcallback namingFonction)
+    {
+        mNamingFonction = namingFonction;
+    }
 };
 } // namespace CONSOLEMENU_NAMESPACE

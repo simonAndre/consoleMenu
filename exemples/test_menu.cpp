@@ -2,11 +2,15 @@
 #include <consoleMenu.h>
 using namespace std;
 
+//prototypes
 bool initIntValue(const char *menuname);
 bool initStringValue(const char *menuname);
 bool DisplayStringValue(const char *menuname);
-bool menu1(const char *menuname);
-bool menu2(const char *menuname);
+bool simpleMenu();
+bool buildInfos();
+bool menuParamName(const char *menuname);
+bool switchMenu(ushort menukey, const char *menuname);
+const char *switchMenuDisplay(ushort menukey);
 
 /*****  stdio functions ********/
 void DisplayInfos(const char *infos)
@@ -30,6 +34,12 @@ ushort WaitforInput2()
 Menu m = Menu();
 // Menu m = Menu(DisplayInfos, WaitforInput);
 
+enum MyMenuKeys
+{
+    switchmenu1,
+    switchmenu2
+};
+
 void SetupMenu()
 {
     // declaration,
@@ -42,18 +52,21 @@ void SetupMenu()
     mo.addExitForEachLevel = true;
     m.setOptions(mo);
 
-    m.addMenuitem("build infos", menu1, 0);
-    m.addMenuitem("action 2", menu2, 0);
-    ushort menu3id = m.addMenuitem("sous-menu 3", NULL, 0);
-    // level 2 menus, under the item [menu3id]
-    m.addMenuitem("init string and stay", initStringValue, menu3id);
-    m.addMenuitem("display string and stay", DisplayStringValue, menu3id);
-    m.addMenuitem("menu init int and stop", initIntValue, menu3id);
+    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0); // simple callback without parameter, see function simpleMenu
+    m.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
+    ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
+    // level 2 menus, under the item [submenu1id]
+    m.addCallbackMenuitem("init string and stay", initStringValue, submenu1id);
+    m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1id);
+    m.addCallbackMenuitem("menu init int and stop", initIntValue, submenu1id);
+    //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
+    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1id, (ushort)MyMenuKeys::switchmenu1);
 
     // more levels can be chained...
-    ushort menu33id = m.addMenuitem("sous-menu 3-3", NULL, menu3id);
-    m.addMenuitem("menu 3-3-1 (build infos)", menu1, menu33id);
-    m.addMenuitem("menu 3-3-2", menu2, menu33id);
+    ushort submenu2id = m.addHierarchyMenuitem("sub menu 2", submenu1id);
+    m.addCallbackMenuitem("build infos", buildInfos, submenu2id); //still a simple menu
+    //another dynamic menu bind to the same callbacks with a different key
+    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
 }
 
 /***********   main   ******************/
@@ -69,20 +82,27 @@ int main()
 }
 
 /********* menus callbacks ***********/
-
-bool menu1(const char *menuname)
+bool simpleMenu()
 {
     cout << "__GNUG__ : " << __GNUG__ << '\n';
     cout << "__cplusplus : " << __cplusplus << '\n';
     cout << "build time : " << __TIMESTAMP__ << '\n';
     cout
-        << "callback menu1 called from " << menuname << '\n';
+        << "callback menu1 called, exit." << '\n';
     return true;
 }
-bool menu2(const char *menuname)
+bool buildInfos()
 {
-    cout << "callback menu1 called from " << menuname << '\n';
-    return true;
+    cout << "__GNUG__ : " << __GNUG__ << '\n';
+    cout << "__cplusplus : " << __cplusplus << '\n';
+    cout << "build time : " << __TIMESTAMP__ << '\n';
+    cout << "come back to the menu" << '\n';
+    return false;
+}
+bool menuParamName(const char *menuname)
+{
+    cout << "callback menu called with the menu display name as param: " << menuname << '\n';
+    return false;
 }
 
 int _intvalue;
@@ -118,4 +138,44 @@ bool DisplayStringValue(const char *menuname)
 {
     cout << "string content : " << _cstringvalue << '\n';
     return false;
+}
+
+bool _switchmenuValue1 = false;
+bool _switchmenuValue2 = false;
+bool switchMenu(ushort menukey, const char *menuname)
+{
+    cout << "Menu " << menuname << " called, now value is : ";
+    switch ((MyMenuKeys)menukey)
+    {
+    case MyMenuKeys::switchmenu1:
+        _switchmenuValue1 = !_switchmenuValue1;
+        cout << _switchmenuValue1 << '\n';
+        break;
+    case MyMenuKeys::switchmenu2:
+        _switchmenuValue2 = !_switchmenuValue2;
+        cout << _switchmenuValue2 << '\n';
+        break;
+    default:
+        throw std::runtime_error("menu key not implemented is switchMenu");
+    }
+    return false;
+}
+char buff[50];
+
+const char *switchMenuDisplay(ushort menukey)
+{
+    switch ((MyMenuKeys)menukey)
+    {
+    case MyMenuKeys::switchmenu1:
+        sprintf(buff, "switch value is %i", _switchmenuValue1);
+        break;
+    case MyMenuKeys::switchmenu2:
+        sprintf(buff, "switch value is %i", _switchmenuValue2);
+        break;
+    default:
+        sprintf(buff, "menukey %i not managed", menukey);
+        break;
+    }
+
+    return buff;
 }
