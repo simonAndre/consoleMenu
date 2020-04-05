@@ -13,7 +13,8 @@ bool buildInfos();
 bool menuParamName(const char *menuname);
 bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
-String takeUserInput();
+String ArduinoTakeUserInput_s(const char *promptmessage);
+int ArduinoTakeUserInput_i(const char *promptmessage);
 
 //variables
 // Menu consolemenu = Menu(DisplayInfos, WaitforInput);
@@ -49,6 +50,7 @@ void setupSerialMenu()
     // root menus
     consolemenu.addCallbackMenuitem("simple menu, no params", simpleMenu, 0); // simple callback without parameter, see function simpleMenu
     consolemenu.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
+    consolemenu.addCallbackMenuitem("test inputs", testIO, 0);                // callback with menu name passed as parameter, see function menuParamName
     ushort submenu1id = consolemenu.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
     consolemenu.addCallbackMenuitem("set string", initStringValue, submenu1id);
@@ -91,25 +93,14 @@ bool menuParamName(const char *menuname)
 int _intvalue;
 bool initIntValue(const char *menuname)
 {
-    Serial.print("enter an int value:");
-    String userinput = takeUserInput();
-    try
-    {
-        _intvalue = atoi(userinput.c_str());
-    }
-    catch (const std::exception &e)
-    {
-        Serial.print("bad input, try again");
-        return false;
-    }
+    _intvalue = ArduinoTakeUserInput_i("enter an int value:");
     return false;
 }
 
 String _stringvalue("-");
 bool initStringValue(const char *menuname)
 {
-    Serial.print("enter an string value:");
-    _stringvalue = takeUserInput();
+    _stringvalue = ArduinoTakeUserInput_s("enter an string value:");
     return false;
 }
 
@@ -167,17 +158,56 @@ const char *switchMenuDisplay(ushort menukey)
     return buff;
 }
 
-String takeUserInput()
+String ArduinoTakeUserInput_s(const char *promptmessage)
 {
+    Serial.print(promptmessage);
+    Serial.print(">");
     bool inputdone = false;
     do
     {
+        delay(20);
         if (Serial.available() > 0)
         {
             String provinput = Serial.readString();
             Serial.println();
             return provinput;
         }
-        delay(50);
     } while (!inputdone);
+}
+
+int ArduinoTakeUserInput_i(const char *promptmessage)
+{
+    String userinput = ArduinoTakeUserInput_s(promptmessage);
+    try
+    {
+        return atoi(userinput.c_str());
+    }
+    catch (const std::exception &e)
+    {
+        Serial.print("bad input, try again");
+        throw e;
+    }
+}
+
+bool testIO()
+{
+    char inputstr[5];
+    IoHelpers::TakeUserInput_s("input a string (less than 5 digits)>", inputstr, sizeof(inputstr));
+    IoHelpers::IOdisplay("your entered:");
+    IoHelpers::IOdisplayLn(inputstr);
+
+    int i;
+    if (IoHelpers::TakeUserInput_i("input an int>", &i, 2))
+    {
+        IoHelpers::IOdisplay("your entered:");
+        IoHelpers::IOdisplayLn(i);
+    }
+
+    double f;
+    if (IoHelpers::TakeUserInput_f("input a decimal >", &f, 2))
+    {
+        IoHelpers::IOdisplay("your entered:");
+        IoHelpers::IOdisplayLn(f);
+    }
+    return false;
 }

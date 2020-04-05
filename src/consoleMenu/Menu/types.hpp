@@ -31,6 +31,10 @@ typedef bool (*fp_callback2)(const char *);
 typedef bool (*fp_callback3)(ushort, const char *);
 typedef void (*fp_IOdisplay)(const char *);
 typedef const char *(*fp_IOinput)(void);
+/**
+ * @brief prototype of pointer to a function aiming at listen to an IO input for an id. 
+ * 
+ */
 typedef ushort (*fp_IOinputId)(void);
 typedef const char *fp_namingcallback(ushort menukey);
 typedef struct

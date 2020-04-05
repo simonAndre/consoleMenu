@@ -44,8 +44,8 @@ public:
      */
     Menu()
     {
-        _displayCallback = IOcallbacks::displayInfosDefaultCallback;
-        _inputId = IOcallbacks::waitforInputIntDefaultCallback;
+        _displayCallback = IoHelpers::IOdisplay;
+        _inputId = Menu::waitforInputIntDefaultCallback;
         internalInit();
     }
     /**
@@ -267,6 +267,21 @@ private:
     }
 
     /**
+ * @brief default implementation for fp_IOinput
+ * 
+ * @return ushort 
+ */
+    static ushort waitforInputIntDefaultCallback()
+    {
+        ushort i;
+        if (IoHelpers::TakeUserInput_i("", &i, 1))
+        {
+            return i;
+        }
+        return 0;
+    }
+
+    /**
      * @brief compute the menu rendering given the context
      * for internal recursive calls
      * 
@@ -275,7 +290,7 @@ private:
      */
     void displayMenu(ushort hierarchyId, ushort lasthierachyid)
     {
-        std::string display("");
+        std::string display("---------------------\n");
         ushort ix = 0;
         std::map<ushort, Menuitem>::iterator it;
         std::map<ushort, ushort> menuitems;
@@ -321,7 +336,7 @@ private:
 
         ushort menuitemid;
         bool done = false;
-        display.append("please choose a menu: >");
+        display.append("please choose an action: >");
         do
         {
             try

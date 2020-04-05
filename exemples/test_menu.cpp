@@ -12,6 +12,7 @@ bool buildInfos();
 bool menuParamName(const char *menuname);
 bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
+bool testIO();
 
 /*****  stdio functions ********/
 void DisplayInfos(const char *infos)
@@ -55,6 +56,7 @@ void SetupMenu()
 
     m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0); // simple callback without parameter, see function simpleMenu
     m.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
+    m.addCallbackMenuitem("test inputs", testIO, 0);                // callback with menu name passed as parameter, see function menuParamName
     ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
     m.addCallbackMenuitem("set string", initStringValue, submenu1id);
@@ -184,4 +186,27 @@ const char *switchMenuDisplay(ushort menukey)
     }
 
     return buff;
+}
+
+bool testIO()
+{
+    char inputstr[5];
+    IoHelpers::TakeUserInput_s("input a string (less than 5 digits)>", inputstr, sizeof(inputstr));
+    IoHelpers::IOdisplay("your entered:");
+    IoHelpers::IOdisplayLn(inputstr);
+
+    int i;
+    if (IoHelpers::TakeUserInput_i("input an int>", &i, 2))
+    {
+        IoHelpers::IOdisplay("your entered:");
+        IoHelpers::IOdisplayLn(i);
+    }
+
+    double f;
+    if (IoHelpers::TakeUserInput_f("input a decimal >", &f, 2))
+    {
+        IoHelpers::IOdisplay("your entered:");
+        IoHelpers::IOdisplayLn(f);
+    }
+    return false;
 }

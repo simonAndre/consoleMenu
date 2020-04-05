@@ -18,7 +18,7 @@
 #include "commontypes.hpp"
 #include "consoleMenu/Menu/types.hpp"
 #include "consoleMenu/Menu/Menuitem.hpp"
-#include "consoleMenu/Menu/IOcallbacks.hpp"
+#include "consoleMenu/Menu/IoHelpers.hpp"
 #include "consoleMenu/Menu/Menu.hpp"
 
 #if CONSOLEMENU_EMBEDDED_MODE
@@ -29,6 +29,7 @@
 
 namespace consoleMenu
 {
+using CONSOLEMENU_NAMESPACE::IoHelpers;
 using CONSOLEMENU_NAMESPACE::Menu;
 using CONSOLEMENU_NAMESPACE::MenuOptions;
 using CONSOLEMENU_NAMESPACE::ushort;
