@@ -15,6 +15,9 @@ public:
     fp_callback2 mFonction_form2 = NULL;
     fp_callback3 mFonction_form3 = NULL;
     fp_namingcallback *mNamingFonction = NULL;
+    void *variableToUpdate = NULL;
+    ushort inputtrials;
+    size_t stringToUpdateSize;
 
     /**
  * @brief Construct a new Menuitem object
@@ -48,6 +51,18 @@ public:
     void SetNamingCallback(fp_namingcallback namingFonction)
     {
         mNamingFonction = namingFonction;
+    }
+    void SetVarToUpdate(void *varptr)
+    {
+        variableToUpdate = varptr;
+    }
+    void SetInputTrials(ushort trials)
+    {
+        inputtrials = trials;
+    }
+    void SetStringToUpdateSize(size_t size)
+    {
+        stringToUpdateSize = size;
     }
 };
 } // namespace CONSOLEMENU_NAMESPACE

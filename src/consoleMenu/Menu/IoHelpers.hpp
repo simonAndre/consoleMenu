@@ -31,7 +31,7 @@ private:
         ushort i = 0;
         do
         {
-            if (!TakeUserInput_s(promptmessage, outstr, stringbuffersize))
+            if (!TakeUserInput(promptmessage, outstr, stringbuffersize, 1))
             {
                 i++;
                 continue;
@@ -83,6 +83,18 @@ public:
         IOdisplay(ivalue);
         IOdisplay("\n");
     }
+
+    /**
+ * @brief diplay a bool value followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
+ * 
+ * @param infos 
+ */
+    static void IOdisplayLn(bool value)
+    {
+        IOdisplay(value);
+        IOdisplay("\n");
+    }
+
     /**
  * @brief diplay a float/double value followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
  * 
@@ -120,6 +132,7 @@ public:
         std::cout << ivalue;
 #endif
     }
+
     /**
  * @brief diplay a float/double value to the user on the available console (use Serial for embedded devices, std::cout for computers)
  * 
@@ -133,6 +146,27 @@ public:
         std::cout << fvalue;
 #endif
     }
+
+    /**
+ * @brief diplay a bool value to the user on the available console (use Serial for embedded devices, std::cout for computers)
+ * 
+ * @param infos 
+ */
+    static void IOdisplay(bool bvalue)
+    {
+#if CONSOLEMENU_EMBEDDED_MODE
+        if (bvalue)
+            Serial.print("y");
+        else
+            Serial.print("n");
+#else
+        if (bvalue)
+            std::cout << "y";
+        else
+            std::cout << "n";
+#endif
+    }
+
     /**
  * @brief Wait for a user input given from the available console (use Serial for embedded devices, std::cin for computers)
  * 
@@ -196,24 +230,26 @@ public:
  * @return true : good input, 
  * @return false : bad input : oversize input string 
  */
-    static bool TakeUserInput_s(const char *promptmessage, char *outstring, size_t stringbuffersize)
+    static bool TakeUserInput(const char *promptmessage, char *outstring, size_t stringbuffersize, ushort trials)
     {
         IOdisplay(promptmessage);
         IOdisplay(">");
-        return WaitforInput(outstring, stringbuffersize);
-        // if (strlen(inpubuff) < stringbuffersize)
-        //     strncpy(outstring, inpubuff, strlen(inpubuff) + 1);
-        // else
-        // {
-        //     IOdisplayLn("oversize input.");
-        //     return false;
-        // }
-        return true;
+        ushort t = 0;
+        while (!WaitforInput(outstring, stringbuffersize) && t++ < trials)
+        {
+        }
+        if (t < trials)
+            return true;
+        return false;
     }
 
     static bool testint(char c)
     {
         return (c >= 48 && c <= 57);
+    }
+    static bool testbool(char c)
+    {
+        return (c == 48 || c == 49 || c == 110 || c == 121); // 0 or 1 or y or n
     }
     static bool testdecimal(char c)
     {
@@ -229,10 +265,10 @@ public:
  * @return true : good input
  * @return false : input failure, expiration of the given trials, don't use the outnumber pointer.
  */
-    static bool TakeUserInput_i(const char *promptmessage, int *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, int *outnumber, ushort trials)
     {
         ushort int_nbdigitmax = 10;
-        char userstring[int_nbdigitmax];
+        char userstring[int_nbdigitmax + 1];
         if (_takeUserInputPrim(promptmessage, testint, userstring, int_nbdigitmax, trials))
         {
             *outnumber = atoi(userstring);
@@ -241,16 +277,43 @@ public:
         else
             return false;
     }
-    static bool TakeUserInput_i(const char *promptmessage, ushort *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, ushort *outnumber, ushort trials)
     {
         int i;
-        if (TakeUserInput_i(promptmessage, &i, trials))
+        if (TakeUserInput(promptmessage, &i, trials))
         {
             if (i >= 65535)
                 return false;
             *outnumber = (ushort)i;
             return true;
         }
+    }
+    /**
+ * @brief bool input code as  0 / 1 or y / n
+ * 
+ * @param promptmessage 
+ * @param outvalue 
+ * @param trials 
+ * @return true 
+ * @return false 
+ */
+    static bool TakeUserInput(const char *promptmessage, bool *outvalue, ushort trials)
+    {
+        ushort siz = 2;
+        char userstring[siz];
+        if (_takeUserInputPrim(promptmessage, testbool, userstring, siz, trials))
+        {
+            if (*userstring == 'y' || *userstring == '1')
+                *outvalue = true;
+            else if (*userstring == 'n' || *userstring == '0')
+                *outvalue = false;
+            else
+                return false;
+
+            return true;
+        }
+        else
+            return false;
     }
 
     /**
@@ -262,7 +325,7 @@ public:
  * @return true : good input
  * @return false : input failure, expiration of the given trials, don't use the outnumber pointer.
  */
-    static bool TakeUserInput_f(const char *promptmessage, double *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, double *outnumber, ushort trials)
     {
         ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];

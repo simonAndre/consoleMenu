@@ -1,5 +1,6 @@
 #include <iostream>
 #include <consoleMenu.h>
+#include <typeinfo>
 using namespace std;
 
 //prototypes
@@ -13,6 +14,14 @@ bool menuParamName(const char *menuname);
 bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
 bool testIO();
+bool displaystr1();
+bool displayint1();
+bool displaybool1();
+
+// variables
+char str1[30];
+int int1 = 1234;
+bool bool1;
 
 /*****  stdio functions ********/
 void DisplayInfos(const char *infos)
@@ -20,13 +29,8 @@ void DisplayInfos(const char *infos)
     cout << infos;
 }
 
-const char *WaitforInput()
-{
-    string input;
-    cin >> input;
-    return input.c_str();
-}
-ushort WaitforInput2()
+// exemple of a method controlling the IO input (provided by default by the library)
+ushort WaitforInput()
 {
     ushort input;
     cin >> input;
@@ -34,6 +38,7 @@ ushort WaitforInput2()
 }
 
 Menu m = Menu();
+// next init form to use custom methods controlling IO display and input
 // Menu m = Menu(DisplayInfos, WaitforInput);
 
 enum MyMenuKeys
@@ -56,7 +61,8 @@ void SetupMenu()
 
     m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0); // simple callback without parameter, see function simpleMenu
     m.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
-    m.addCallbackMenuitem("test inputs", testIO, 0);                // callback with menu name passed as parameter, see function menuParamName
+    m.addCallbackMenuitem("test inputs1", testIO, 0);               // callback with menu name passed as parameter, see function menuParamName
+    ushort testinputsid = m.addHierarchyMenuitem("submenu test inputs", 0);
     ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
     m.addCallbackMenuitem("set string", initStringValue, submenu1id);
@@ -71,6 +77,15 @@ void SetupMenu()
     m.addCallbackMenuitem("build infos", buildInfos, submenu2id); //still a simple menu
     //another dynamic menu bind to the same callbacks with a different key
     m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
+
+    m.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
+    m.addUpdaterMenuitem("change str1", testinputsid, (char *)str1, sizeof(str1), 1);
+    m.addCallbackMenuitem("display value int1", displayint1, testinputsid);
+    m.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
+    m.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
+    m.addUpdaterMenuitem("change bool1", testinputsid, &bool1, 2);
+
+    strcpy(str1, "first string");
 }
 
 /***********   main   ******************/
@@ -191,22 +206,38 @@ const char *switchMenuDisplay(ushort menukey)
 bool testIO()
 {
     char inputstr[5];
-    IoHelpers::TakeUserInput_s("input a string (less than 5 digits)>", inputstr, sizeof(inputstr));
+    IoHelpers::TakeUserInput("input a string (less than 5 digits)>", inputstr, sizeof(inputstr), 2);
     IoHelpers::IOdisplay("your entered:");
     IoHelpers::IOdisplayLn(inputstr);
 
     int i;
-    if (IoHelpers::TakeUserInput_i("input an int>", &i, 2))
+    if (IoHelpers::TakeUserInput("input an int>", &i, 2))
     {
         IoHelpers::IOdisplay("your entered:");
         IoHelpers::IOdisplayLn(i);
     }
 
     double f;
-    if (IoHelpers::TakeUserInput_f("input a decimal >", &f, 2))
+    if (IoHelpers::TakeUserInput("input a decimal >", &f, 2))
     {
         IoHelpers::IOdisplay("your entered:");
         IoHelpers::IOdisplayLn(f);
     }
+    return false;
+}
+
+bool displaystr1()
+{
+    IoHelpers::IOdisplayLn(str1);
+    return false;
+}
+bool displayint1()
+{
+    IoHelpers::IOdisplayLn(int1);
+    return false;
+}
+bool displaybool1()
+{
+    IoHelpers::IOdisplayLn(bool1);
     return false;
 }

@@ -192,19 +192,19 @@ int ArduinoTakeUserInput_i(const char *promptmessage)
 bool testIO()
 {
     char inputstr[5];
-    IoHelpers::TakeUserInput_s("input a string (less than 5 digits)>", inputstr, sizeof(inputstr));
+    IoHelpers::TakeUserInput("input a string (less than 5 digits)>", inputstr, sizeof(inputstr), 2);
     IoHelpers::IOdisplay("your entered:");
     IoHelpers::IOdisplayLn(inputstr);
 
     int i;
-    if (IoHelpers::TakeUserInput_i("input an int>", &i, 2))
+    if (IoHelpers::TakeUserInput("input an int>", &i, 2))
     {
         IoHelpers::IOdisplay("your entered:");
         IoHelpers::IOdisplayLn(i);
     }
 
     double f;
-    if (IoHelpers::TakeUserInput_f("input a decimal >", &f, 2))
+    if (IoHelpers::TakeUserInput("input a decimal >", &f, 2))
     {
         IoHelpers::IOdisplay("your entered:");
         IoHelpers::IOdisplayLn(f);

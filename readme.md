@@ -70,6 +70,12 @@ m.addCallbackMenuitem("build infos", buildInfos, submenu2id); //still a simple m
 //another dynamic menu bind to the same callbacks with a different key
 m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
 
+// updaters without callbacks:
+m.addUpdaterMenuitem("change string content", submenu2id, (char *)mystring, sizeof(mystring), 2);
+m.addUpdaterMenuitem("change int value", submenu2id, &myint, 2);
+m.addUpdaterMenuitem("change boolean value (alternative to switch)", submenu2id, &mybool, 2);
+
+
 //and display the root menu
 m.displayMenu();
 ```
@@ -128,7 +134,7 @@ bool menucallback(const char *menuname);
 bool menucallback(ushort menukey, const char *menuname);
 ```
 
-### Menu items decalration methods
+### Menu items declaration methods
 
 #### hierarchy menu-item
 
@@ -190,6 +196,36 @@ with :
 + parentid : if this menuitem is under a submenu : id of the parent item
 + menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique). This key is passed back to the callback
 + --> return value : id of the new menu-item created.
+
+#### Updater menu-item 
+
+Provides a straight-forward method to prompt the user for an update on the content of a variable, without any callback.
+A pointer to the target variable is given as parameter to this method.
+The target variable can be of the following types: 
++ c-string (char*)
++ int
++ ushort (unsigned short)
++ double/float
++ bool (true value can be input as y or 1 and false : n or 0)
+
+```c++
+// for a string:
+ushort addUpdaterMenuitem(const char *menuname, ushort parentid, char *variableToUpdate, size_t stringsize, ushort trials)
+
+// for other supported types : 
+ushort addUpdaterMenuitem(const char *menuname, ushort parentid, <TYPE> *variableToUpdate, ushort trials)
+```
+
+with : 
+
++ menuname : label of the menuitem (as seen by the end-user)
++ parentid : if this menuitem is under a submenu : id of the parent item
++ variableToUpdate : pointer to the variable to be updated
++ stringsize (for string only) : size max of the c-string (buffer of char)
++ trials : number of given trials before issuing a failure and exits the assignement loop.
++ --> return value : id of the new menu-item created.
+
+
 
 
 

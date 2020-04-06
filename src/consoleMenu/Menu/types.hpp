@@ -46,10 +46,17 @@ typedef struct
 
 enum menutype
 {
-     externalFunction = 0,
-     exit = 1, //exit the menu
-     back = 2, //back to the parent menuitem
-     hierarchymenu = 3
+     externalFunction,
+     exit, //exit the menu
+     back, //back to the parent menuitem
+     hierarchymenu,
+
+     //value from 50 to 60 are reserved for variableUpdaters
+     variableUpdater_i = 50,  //variable updater int
+     variableUpdater_us = 51, //variable updater ushort
+     variableUpdater_d = 52,  //variable double
+     variableUpdater_s = 53,  //variable string
+     variableUpdater_b = 54,  //variable bool
 };
 
 } // namespace CONSOLEMENU_NAMESPACE

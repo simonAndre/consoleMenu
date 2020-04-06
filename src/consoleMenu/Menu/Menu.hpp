@@ -149,6 +149,93 @@ public:
     }
 
     /**
+ * @brief add a menu item designed for one goal : update an string value in a given pointer to a variable.
+ * 
+ * @param menuname
+ * @param parentid 
+ * @param variableToUpdate : pointer to the variable to be updated
+ * @param stringsize : size max of the c-string (buffer of char)
+ * @param trials : number of given trials before issuing a failure and exits the assignement loop.
+ * @return ushort : menuid created
+ */
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, char *variableToUpdate, size_t stringsize, ushort trials)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_s, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetStringToUpdateSize(stringsize);
+        return newmenuitem.mid;
+    }
+
+    /**
+ * @brief add a menu item designed for one goal : update an int value in a given pointer to a variable.
+ * 
+ * @param menuname
+ * @param parentid 
+ * @param variableToUpdate : pointer to the variable to be updated
+ * @param trials : number of given trials before issuing a failure and exits the assignement loop.
+ * @return ushort : menuid created
+ */
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, int *variableToUpdate, ushort trials)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_i, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        return newmenuitem.mid;
+    }
+
+    /**
+ * @brief add a menu item designed for one goal : update an int value in a given pointer to a variable.
+ * 
+ * @param menuname
+ * @param parentid 
+ * @param variableToUpdate : pointer to the variable to be updated
+ * @param trials : number of given trials before issuing a failure and exits the assignement loop.
+ * @return ushort : menuid created
+ */
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, ushort *variableToUpdate, ushort trials)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_us, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        return newmenuitem.mid;
+    }
+
+    /**
+ * @brief add a menu item designed for one goal : update an int value in a given pointer to a variable.
+ * 
+ * @param menuname
+ * @param parentid 
+ * @param variableToUpdate : pointer to the variable to be updated
+ * @param trials : number of given trials before issuing a failure and exits the assignement loop.
+ * @return ushort : menuid created
+ */
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, double *variableToUpdate, ushort trials)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_d, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        return newmenuitem.mid;
+    }
+
+    /**
+ * @brief add a menu item designed for one goal : update an int value in a given pointer to a variable.
+ * 
+ * @param menuname
+ * @param parentid 
+ * @param variableToUpdate : pointer to the variable to be updated
+ * @param trials : number of given trials before issuing a failure and exits the assignement loop.
+ * @return ushort : menuid created
+ */
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, bool *variableToUpdate, ushort trials)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_b, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        return newmenuitem.mid;
+    }
+
+    /**
      * @brief Set  Options for meuns
      * 
      * @param options 
@@ -274,7 +361,7 @@ private:
     static ushort waitforInputIntDefaultCallback()
     {
         ushort i;
-        if (IoHelpers::TakeUserInput_i("", &i, 1))
+        if (IoHelpers::TakeUserInput("", &i, 1))
         {
             return i;
         }
@@ -395,6 +482,20 @@ private:
                             _displayCallback(">exited\n");
                         break;
                     default:
+                        if (mi.mtype >= 50 && mi.mtype <= 60)
+                        {
+                            done = variableUpdater(mi);
+                            if (!done && mi.mNamingFonction != NULL)
+                            {
+                                //recursive call to display again the menu and reload the menu display callback
+                                displayMenu(hierarchyId, lasthierachyid);
+                                return;
+                            }
+                            if (done)
+                                _displayCallback(">exited\n");
+                        }
+                        else
+                            throw std::runtime_error("this menutype is not implemented");
                         break;
                     }
                 }
@@ -406,6 +507,44 @@ private:
         } while (!done);
     }
 
+    bool variableUpdater(Menuitem mi)
+    {
+        char *vartoupdate_s;
+        int vartoupdate_i;
+        switch (mi.mtype)
+        {
+        case menutype::variableUpdater_s:
+            IoHelpers::IOdisplay("current value is : [");
+            IoHelpers::IOdisplay((char *)mi.variableToUpdate);
+            IoHelpers::IOdisplayLn("]");
+            IoHelpers::TakeUserInput("enter new value>", (char *)mi.variableToUpdate, mi.stringToUpdateSize, mi.inputtrials);
+            return false;
+        case menutype::variableUpdater_i:
+            IoHelpers::IOdisplay("current value is : [");
+            IoHelpers::IOdisplay(*(int *)mi.variableToUpdate);
+            IoHelpers::IOdisplayLn("]");
+            IoHelpers::TakeUserInput("enter new value>", (int *)mi.variableToUpdate, mi.inputtrials);
+            return false;
+        case menutype::variableUpdater_us:
+            IoHelpers::IOdisplay("current value is : [");
+            IoHelpers::IOdisplay(*(ushort *)mi.variableToUpdate);
+            IoHelpers::IOdisplayLn("]");
+            IoHelpers::TakeUserInput("enter new value>", (ushort *)mi.variableToUpdate, mi.inputtrials);
+            return false;
+        case menutype::variableUpdater_d:
+            IoHelpers::IOdisplay("current value is : [");
+            IoHelpers::IOdisplay(*(double *)mi.variableToUpdate);
+            IoHelpers::IOdisplayLn("]");
+            IoHelpers::TakeUserInput("enter new value>", (double *)mi.variableToUpdate, mi.inputtrials);
+            return false;
+        case menutype::variableUpdater_b:
+            IoHelpers::IOdisplay("current value is : [");
+            IoHelpers::IOdisplay(*(bool *)mi.variableToUpdate);
+            IoHelpers::IOdisplayLn("]");
+            IoHelpers::TakeUserInput("enter new value>", (bool *)mi.variableToUpdate, mi.inputtrials);
+            return false;
+        }
+    }
     /**
  * @brief call the menu function
  * 
