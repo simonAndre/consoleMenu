@@ -19,7 +19,7 @@ bool displayint1();
 bool displaybool1();
 
 // variables
-char str1[30];
+char staticString[30];
 int int1 = 1234;
 bool bool1;
 
@@ -59,9 +59,9 @@ void SetupMenu()
     mo.addExitForEachLevel = true;
     m.setOptions(mo);
 
-    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0); // simple callback without parameter, see function simpleMenu
-    m.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
-    m.addCallbackMenuitem("test inputs1", testIO, 0);               // callback with menu name passed as parameter, see function menuParamName
+    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);    // simple callback without parameter, see function simpleMenu
+    m.addCallbackMenuitem("action menu with param", menuParamName, 0); // callback with menu name passed as parameter, see function menuParamName
+    m.addCallbackMenuitem("test prompted inputs", testIO, 0);          // callback with menu name passed as parameter, see function menuParamName
     ushort testinputsid = m.addHierarchyMenuitem("submenu test inputs", 0);
     ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
@@ -79,13 +79,13 @@ void SetupMenu()
     m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
 
     m.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
-    m.addUpdaterMenuitem("change str1", testinputsid, (char *)str1, sizeof(str1), 1);
+    m.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString), 1);
     m.addCallbackMenuitem("display value int1", displayint1, testinputsid);
     m.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
     m.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
     m.addUpdaterMenuitem("change bool1", testinputsid, &bool1, 2);
 
-    strcpy(str1, "first string");
+    strcpy(staticString, "first string");
 }
 
 /***********   main   ******************/
@@ -228,7 +228,7 @@ bool testIO()
 
 bool displaystr1()
 {
-    IoHelpers::IOdisplayLn(str1);
+    IoHelpers::IOdisplayLn(staticString);
     return false;
 }
 bool displayint1()

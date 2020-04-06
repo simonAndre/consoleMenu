@@ -15,8 +15,20 @@ bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
 String ArduinoTakeUserInput_s(const char *promptmessage);
 int ArduinoTakeUserInput_i(const char *promptmessage);
+bool displaystr1();
+bool displayint1();
+bool displaybool1();
 
-//variables
+// variables
+char staticString[30];
+int int1 = 1234;
+bool bool1;
+int _intvalue;
+String _stringvalue("-");
+bool _switchmenuValue1 = false;
+bool _switchmenuValue2 = false;
+char buff[50];
+
 // Menu consolemenu = Menu(DisplayInfos, WaitforInput);
 Menu consolemenu = Menu();
 
@@ -48,9 +60,10 @@ void setupSerialMenu()
     consolemenu.setOptions(menuoptions);
     // menus & submenus definition
     // root menus
-    consolemenu.addCallbackMenuitem("simple menu, no params", simpleMenu, 0); // simple callback without parameter, see function simpleMenu
-    consolemenu.addCallbackMenuitem("action 2", menuParamName, 0);            // callback with menu name passed as parameter, see function menuParamName
-    consolemenu.addCallbackMenuitem("test inputs", testIO, 0);                // callback with menu name passed as parameter, see function menuParamName
+    consolemenu.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);    // simple callback without parameter, see function simpleMenu
+    consolemenu.addCallbackMenuitem("action menu with param", menuParamName, 0); // callback with menu name passed as parameter, see function menuParamName
+    consolemenu.addCallbackMenuitem("test prompted inputs", testIO, 0);          // callback with menu name passed as parameter, see function menuParamName
+    ushort testinputsid = consolemenu.addHierarchyMenuitem("submenu test inputs", 0);
     ushort submenu1id = consolemenu.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
     consolemenu.addCallbackMenuitem("set string", initStringValue, submenu1id);
@@ -65,6 +78,13 @@ void setupSerialMenu()
     consolemenu.addCallbackMenuitem("build infos", buildInfos, submenu2id); //still a simple menu
     //another dynamic menu bind to the same callbacks with a different key
     consolemenu.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
+
+    consolemenu.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
+    consolemenu.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString), 1);
+    consolemenu.addCallbackMenuitem("display value int1", displayint1, testinputsid);
+    consolemenu.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
+    consolemenu.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
+    consolemenu.addUpdaterMenuitem("change bool1", testinputsid, &bool1, 2);
 }
 
 /********* menus callbacks ***********/
@@ -90,14 +110,12 @@ bool menuParamName(const char *menuname)
     return false;
 }
 
-int _intvalue;
 bool initIntValue(const char *menuname)
 {
     _intvalue = ArduinoTakeUserInput_i("enter an int value:");
     return false;
 }
 
-String _stringvalue("-");
 bool initStringValue(const char *menuname)
 {
     _stringvalue = ArduinoTakeUserInput_s("enter an string value:");
@@ -116,8 +134,7 @@ bool DisplayIntValue()
     Serial.println(_intvalue);
     return true;
 }
-bool _switchmenuValue1 = false;
-bool _switchmenuValue2 = false;
+
 bool switchMenu(ushort menukey, const char *menuname)
 {
     Serial.print("Menu ");
@@ -139,7 +156,6 @@ bool switchMenu(ushort menukey, const char *menuname)
     return false;
 }
 
-char buff[50];
 const char *switchMenuDisplay(ushort menukey)
 {
     switch ((MyMenuKeys)menukey)
@@ -209,5 +225,21 @@ bool testIO()
         IoHelpers::IOdisplay("your entered:");
         IoHelpers::IOdisplayLn(f);
     }
+    return false;
+}
+
+bool displaystr1()
+{
+    IoHelpers::IOdisplayLn(staticString);
+    return false;
+}
+bool displayint1()
+{
+    IoHelpers::IOdisplayLn(int1);
+    return false;
+}
+bool displaybool1()
+{
+    IoHelpers::IOdisplayLn(bool1);
     return false;
 }

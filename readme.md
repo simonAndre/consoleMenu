@@ -18,6 +18,18 @@ work on a callback basis : each call to a memnu item is linked to a simple callb
   + build tu test via the makefile : `make test`
   + run the test : `./test.exe`
 
+## exemple of rendering : 
+
+```
+---------------------
+1 - simple menu, no params
+2 - switch OFF feature1
+3 - test prompted inputs
+4 - submenu test inputs 2
+5 - Sub menu 1
+6 - > exit
+please choose an action: >
+```
 
 ## usage
 
