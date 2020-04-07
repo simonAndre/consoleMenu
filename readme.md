@@ -7,7 +7,12 @@ mainly done for embedded, its main purpose is to be simple and very lightweight 
 
 work on a callback basis : each call to a memnu item is linked to a simple callback function.
 
+## tagets
 
++ linux computers
++ tested embedded microcontroler :
+  + esp32 series (espressif)
+  + for AVR series, use the STL lib (not tested yet)
 
 ## build, test
 
