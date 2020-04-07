@@ -210,6 +210,22 @@ public:
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, unsigned char *variableToUpdate, ushort trials)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_uc, CONSOLEMENU_NOMENUKEY);
+        _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        return newmenuitem.mid;
+    }
+    /**
+ * @brief add a menu item designed for one goal : update an int value in a given pointer to a variable.
+ * 
+ * @param menuname
+ * @param parentid 
+ * @param variableToUpdate : pointer to the variable to be updated
+ * @param trials : number of given trials before issuing a failure and exits the assignement loop.
+ * @return ushort : menuid created
+ */
     ushort addUpdaterMenuitem(const char *menuname, ushort parentid, double *variableToUpdate, ushort trials)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_d, CONSOLEMENU_NOMENUKEY);
@@ -530,6 +546,12 @@ private:
             IoHelpers::IOdisplay(*(ushort *)mi.variableToUpdate);
             IoHelpers::IOdisplayLn("]");
             IoHelpers::TakeUserInput("enter new value>", (ushort *)mi.variableToUpdate, mi.inputtrials);
+            return false;
+        case menutype::variableUpdater_uc:
+            IoHelpers::IOdisplay("current value is : [");
+            IoHelpers::IOdisplay(*(unsigned char *)mi.variableToUpdate);
+            IoHelpers::IOdisplayLn("]");
+            IoHelpers::TakeUserInput("enter new value>", (unsigned char *)mi.variableToUpdate, mi.inputtrials);
             return false;
         case menutype::variableUpdater_d:
             IoHelpers::IOdisplay("current value is : [");

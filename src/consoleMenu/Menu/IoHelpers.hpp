@@ -288,6 +288,17 @@ public:
             return true;
         }
     }
+    static bool TakeUserInput(const char *promptmessage, unsigned char *outnumber, ushort trials)
+    {
+        int i;
+        if (TakeUserInput(promptmessage, &i, trials))
+        {
+            if (i >= 255)
+                return false;
+            *outnumber = (unsigned char)i;
+            return true;
+        }
+    }
     /**
  * @brief bool input code as  0 / 1 or y / n
  * 

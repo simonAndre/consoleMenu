@@ -57,6 +57,7 @@ enum menutype
      variableUpdater_d = 52,  //variable double
      variableUpdater_s = 53,  //variable string
      variableUpdater_b = 54,  //variable bool
+     variableUpdater_uc = 55  //variable unsigned char
 };
 
 } // namespace CONSOLEMENU_NAMESPACE
