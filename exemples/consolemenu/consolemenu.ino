@@ -10,7 +10,7 @@ bool DisplayStringValue(const char *menuname);
 bool DisplayIntValue();
 bool simpleMenu();
 bool buildInfos();
-bool menuParamName(const char *menuname);
+bool getVersionMenu(const char *menuname);
 bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
 String ArduinoTakeUserInput_s(const char *promptmessage);
@@ -60,9 +60,9 @@ void setupSerialMenu()
     consolemenu.setOptions(menuoptions);
     // menus & submenus definition
     // root menus
-    consolemenu.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);    // simple callback without parameter, see function simpleMenu
-    consolemenu.addCallbackMenuitem("action menu with param", menuParamName, 0); // callback with menu name passed as parameter, see function menuParamName
-    consolemenu.addCallbackMenuitem("test prompted inputs", testIO, 0);          // callback with menu name passed as parameter, see function menuParamName
+    consolemenu.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);     // simple callback without parameter, see function simpleMenu
+    consolemenu.addCallbackMenuitem("action menu with param", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
+    consolemenu.addCallbackMenuitem("test prompted inputs", testIO, 0);           // callback with menu name passed as parameter, see function menuParamName
     ushort testinputsid = consolemenu.addHierarchyMenuitem("submenu test inputs", 0);
     ushort submenu1id = consolemenu.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
@@ -103,10 +103,12 @@ bool buildInfos()
     Serial.println(__TIMESTAMP__);
     return false;
 }
-bool menuParamName(const char *menuname)
+
+bool getVersionMenu(const char *menuname)
 {
-    Serial.print("callback menu called with the menu display name as param: ");
-    Serial.println(menuname);
+    Serial.print("current consoleMenu version: ");
+    char *version = consolemenu.getVersion();
+    Serial.println(version);
     return false;
 }
 

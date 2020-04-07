@@ -10,7 +10,7 @@ bool DisplayStringValue();
 bool DisplayIntValue();
 bool simpleMenu();
 bool buildInfos();
-bool menuParamName(const char *menuname);
+bool getVersionMenu(const char *menuname);
 bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
 bool testIO();
@@ -59,9 +59,9 @@ void SetupMenu()
     mo.addExitForEachLevel = true;
     m.setOptions(mo);
 
-    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);    // simple callback without parameter, see function simpleMenu
-    m.addCallbackMenuitem("action menu with param", menuParamName, 0); // callback with menu name passed as parameter, see function menuParamName
-    m.addCallbackMenuitem("test prompted inputs", testIO, 0);          // callback with menu name passed as parameter, see function menuParamName
+    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);  // simple callback without parameter, see function simpleMenu
+    m.addCallbackMenuitem("consoleMenu version", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
+    m.addCallbackMenuitem("test prompted inputs", testIO, 0);        // callback with menu name passed as parameter, see function menuParamName
     ushort testinputsid = m.addHierarchyMenuitem("submenu test inputs", 0);
     ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
     // level 2 menus, under the item [submenu1id]
@@ -118,9 +118,12 @@ bool buildInfos()
     cout << "come back to the menu" << '\n';
     return false;
 }
-bool menuParamName(const char *menuname)
+bool getVersionMenu(const char *menuname)
 {
     cout << "callback menu called with the menu display name as param: " << menuname << '\n';
+    char *version = m.getVersion();
+    cout
+        << "current consoleMenu version: " << version << '\n';
     return false;
 }
 

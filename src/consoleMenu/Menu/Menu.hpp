@@ -48,6 +48,13 @@ public:
         _inputId = Menu::waitforInputIntDefaultCallback;
         internalInit();
     }
+
+    char *getVersion()
+    {
+        sprintf(_version, "%i.%i.%i", CONSOLEMENU_VERSION_MAJOR, CONSOLEMENU_VERSION_MINOR, CONSOLEMENU_VERSION_REVISION);
+        return _version;
+    }
+
     /**
  * @brief Construct a new console Menu object with options specified
  * 
@@ -301,6 +308,8 @@ private:
     fp_IOinputId _inputId;
     MenuOptions _menuoptions;
     bool _isMenuCollectionComplete = false;
+    char _version[10];
+
 #if CONSOLEMENU_EMBEDDED_MODE
     bool _isserialmenuative = false;
 #endif
