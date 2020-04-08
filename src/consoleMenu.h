@@ -3,7 +3,7 @@
 
 #ifdef __cplusplus
 
-#include "consoleMenu.hpp"
+#include "consoleMenu/consoleMenu.hpp"
 
 using namespace consoleMenu;
 

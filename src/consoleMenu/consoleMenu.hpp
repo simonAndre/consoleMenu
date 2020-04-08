@@ -1,6 +1,6 @@
 #pragma once
 
-#include "consoleMenu/Configuration.hpp"
+#include "Configuration.hpp"
 
 #if !CONSOLEMENU_DEBUG
 #ifdef __clang__
@@ -14,12 +14,12 @@
 #define STRING(x) STRING2(x)
 // #pragma message(STRING(__cplusplus))
 
-#include "consoleMenu/Namespace.hpp"
+#include "Namespace.hpp"
 #include "commontypes.hpp"
-#include "consoleMenu/Menu/types.hpp"
-#include "consoleMenu/Menu/Menuitem.hpp"
-#include "consoleMenu/Menu/IoHelpers.hpp"
-#include "consoleMenu/Menu/Menu.hpp"
+#include "Menu/specialTypes.hpp"
+#include "Menu/Menuitem.hpp"
+#include "IO/IoHelpers.hpp"
+#include "Menu/Menu.hpp"
 
 #if CONSOLEMENU_EMBEDDED_MODE
 #include <Arduino.h>
