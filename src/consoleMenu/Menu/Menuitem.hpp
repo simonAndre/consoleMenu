@@ -19,6 +19,84 @@ public:
     ushort inputtrials;
     size_t stringToUpdateSize;
 
+    bool isUpdaterMenuItem()
+    {
+        return this->mtype >= 50 && this->mtype <= 60;
+    }
+
+    /**
+ * @brief display the menu-item current value, if variableToUpdate is set (for updaters menu-items)
+ * 
+ * @param displaycb : display callback
+ * @param addbrackets : true to surround with brackets
+ */
+    void displayCurrentValue()
+    {
+        if (this->variableToUpdate != NULL)
+        {
+            switch (this->mtype)
+            {
+            case menutype::variableUpdater_s:
+                IoHelpers::IOdisplay((char *)this->variableToUpdate);
+                break;
+            case menutype::variableUpdater_i:
+                IoHelpers::IOdisplay(*(int *)this->variableToUpdate);
+                break;
+            case menutype::variableUpdater_us:
+                IoHelpers::IOdisplay(*(ushort *)this->variableToUpdate);
+                break;
+            case menutype::variableUpdater_uc:
+                IoHelpers::IOdisplay(*(unsigned char *)this->variableToUpdate);
+                break;
+            case menutype::variableUpdater_d:
+                IoHelpers::IOdisplay(*(double *)this->variableToUpdate);
+                break;
+            case menutype::variableUpdater_b:
+                IoHelpers::IOdisplay(*(bool *)this->variableToUpdate);
+                break;
+            }
+        }
+    }
+
+    /**
+ * @brief take the user input, if variableToUpdate is set (for updaters menu-items)
+ * 
+ * @return true 
+ * @return false 
+ */
+    bool takeUserInput()
+    {
+        if (this->variableToUpdate != NULL)
+        {
+            switch (this->mtype)
+            {
+            case menutype::variableUpdater_s:
+                return IoHelpers::TakeUserInput("enter new value>", (char *)this->variableToUpdate, this->stringToUpdateSize, this->inputtrials);
+            case menutype::variableUpdater_i:
+                return IoHelpers::TakeUserInput("enter new value>", (int *)this->variableToUpdate, this->inputtrials);
+            case menutype::variableUpdater_us:
+                return IoHelpers::TakeUserInput("enter new value>", (ushort *)this->variableToUpdate, this->inputtrials);
+            case menutype::variableUpdater_uc:
+                return IoHelpers::TakeUserInput("enter new value>", (unsigned char *)this->variableToUpdate, this->inputtrials);
+            case menutype::variableUpdater_d:
+                return IoHelpers::TakeUserInput("enter new value>", (double *)this->variableToUpdate, this->inputtrials);
+            case menutype::variableUpdater_b:
+                if (CONSOLEMENU_UPDATERMENU_BOOLMODESWITCH == 1)
+                {
+                    *(bool *)this->variableToUpdate = !*(bool *)this->variableToUpdate;
+                    return true;
+                }
+                else
+                {
+                    return IoHelpers::TakeUserInput("enter new value (0/1)>", (bool *)this->variableToUpdate, this->inputtrials);
+                }
+            default:
+                break;
+            }
+        }
+        return false;
+    }
+
     /**
  * @brief Construct a new Menuitem object
  * 

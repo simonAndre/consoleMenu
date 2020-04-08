@@ -194,14 +194,14 @@ public:
     {
 #if CONSOLEMENU_EMBEDDED_MODE
         if (bvalue)
-            Serial.print("y");
+            Serial.print(CONSOLEMENU_DISPLAYFORBOOLVALUE_TRUE);
         else
-            Serial.print("n");
+            Serial.print(CONSOLEMENU_DISPLAYFORBOOLVALUE_FALSE);
 #else
         if (bvalue)
-            std::cout << "y";
+            std::cout << CONSOLEMENU_DISPLAYFORBOOLVALUE_TRUE;
         else
-            std::cout << "n";
+            std::cout << CONSOLEMENU_DISPLAYFORBOOLVALUE_FALSE;
 #endif
     }
 

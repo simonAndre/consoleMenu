@@ -84,7 +84,7 @@ void setupSerialMenu()
     consolemenu.addCallbackMenuitem("display value int1", displayint1, testinputsid);
     consolemenu.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
     consolemenu.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
-    consolemenu.addUpdaterMenuitem("change bool1", testinputsid, &bool1, 2);
+    consolemenu.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
 }
 
 /********* menus callbacks ***********/
