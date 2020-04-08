@@ -2,9 +2,15 @@
 
 namespace CONSOLEMENU_NAMESPACE
 {
+
+//forward declaration
+class Menu;
+
 class Menuitem
 {
 private:
+    Menu *_menuinstance;
+
 public:
     ushort mid;
     ushort mparentid = 0;
@@ -18,6 +24,29 @@ public:
     void *variableToUpdate = NULL;
     ushort inputtrials;
     size_t stringToUpdateSize;
+
+    // Menuitem(Menu menuinstance)
+    // {
+    //     _menuinstance = menuinstance;
+    // };
+
+    /**
+ * @brief Construct a new Menuitem object
+ * 
+ * @param menuname 
+ * @param id 
+ * @param parentid 
+ * @param menuFonction 
+ * @param type 
+ */
+    Menuitem(Menu *menuinstance, const char *menuname, ushort id, ushort parentid, menutype type)
+    {
+        _menuinstance = menuinstance;
+        mid = id;
+        mparentid = parentid;
+        mname = std::string(menuname);
+        mtype = type;
+    }
 
     bool isUpdaterMenuItem()
     {
@@ -95,23 +124,6 @@ public:
             }
         }
         return false;
-    }
-
-    /**
- * @brief Construct a new Menuitem object
- * 
- * @param menuname 
- * @param id 
- * @param parentid 
- * @param menuFonction 
- * @param type 
- */
-    Menuitem(const char *menuname, ushort id, ushort parentid, menutype type)
-    {
-        mid = id;
-        mparentid = parentid;
-        mname = std::string(menuname);
-        mtype = type;
     }
 
     void SetCallback(fp_callback1 menuFonction)

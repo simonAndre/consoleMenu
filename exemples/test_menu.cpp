@@ -63,28 +63,28 @@ void SetupMenu()
     m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);  // simple callback without parameter, see function simpleMenu
     m.addCallbackMenuitem("consoleMenu version", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
     m.addCallbackMenuitem("test prompted inputs", testIO, 0);        // callback with menu name passed as parameter, see function menuParamName
-    ushort testinputsid = m.addHierarchyMenuitem("submenu test inputs", 0);
-    ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0, 66);
-    // level 2 menus, under the item [submenu1id]
-    m.addCallbackMenuitem("set string", initStringValue, submenu1id);
-    m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1id);
-    m.addCallbackMenuitem("set int value", initIntValue, submenu1id);
-    m.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1id);
+    Menuitem testinputs = m.addHierarchyMenuitem("submenu test inputs", 0);
+    Menuitem submenu1 = m.addHierarchyMenuitem("Sub menu 1", 0, 66);
+    // level 2 menus, under the item [submenu1]
+    m.addCallbackMenuitem("set string", initStringValue, submenu1.mid);
+    m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1.mid);
+    m.addCallbackMenuitem("set int value", initIntValue, submenu1.mid);
+    m.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1.mid);
     //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
-    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1id, (ushort)MyMenuKeys::switchmenu1);
+    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1.mid, (ushort)MyMenuKeys::switchmenu1);
 
     // more levels can be chained...
-    ushort submenu2id = m.addHierarchyMenuitem("sub menu 2", submenu1id);
-    m.addCallbackMenuitem("build infos", buildInfos, submenu2id); //still a simple menu
+    Menuitem submenu2 = m.addHierarchyMenuitem("sub menu 2", submenu1.mid);
+    m.addCallbackMenuitem("build infos", buildInfos, submenu2.mid); //still a simple menu
     //another dynamic menu bind to the same callbacks with a different key
-    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
+    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2.mid, (ushort)MyMenuKeys::switchmenu2);
 
-    m.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
-    m.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString));
-    m.addCallbackMenuitem("display value int1", displayint1, testinputsid);
-    m.addUpdaterMenuitem("change int1", testinputsid, &int1);
-    m.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
-    m.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
+    m.addCallbackMenuitem("display value str1", displaystr1, testinputs.mid);
+    m.addUpdaterMenuitem("change str1", testinputs.mid, (char *)staticString, sizeof(staticString));
+    m.addCallbackMenuitem("display value int1", displayint1, testinputs.mid);
+    m.addUpdaterMenuitem("change int1", testinputs.mid, &int1);
+    m.addCallbackMenuitem("display value bool1", displaybool1, testinputs.mid);
+    m.addUpdaterMenuitem("change bool1", testinputs.mid, &bool1);
 
     auto mi = m.getByKey(66);
     m.addCallbackMenuitem("late created menu", simpleMenu, mi.mid);
