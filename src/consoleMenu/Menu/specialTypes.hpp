@@ -44,6 +44,7 @@ typedef struct
      bool addExitForEachLevel = true; //if false and addBack is true : the exist menuitem is only available at the root
      const char *id_separator = " - ";
      bool addCurrentState = true; // if true : display the current state for each menuitem, for updater menu items only.
+     ushort badInputRepeats = 1;  // nb of allowed trials for bad input before failing the input of a menu.
 } MenuOptions;
 
 enum menutype

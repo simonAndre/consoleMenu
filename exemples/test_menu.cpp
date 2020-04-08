@@ -64,7 +64,7 @@ void SetupMenu()
     m.addCallbackMenuitem("consoleMenu version", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
     m.addCallbackMenuitem("test prompted inputs", testIO, 0);        // callback with menu name passed as parameter, see function menuParamName
     ushort testinputsid = m.addHierarchyMenuitem("submenu test inputs", 0);
-    ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0);
+    ushort submenu1id = m.addHierarchyMenuitem("Sub menu 1", 0, 66);
     // level 2 menus, under the item [submenu1id]
     m.addCallbackMenuitem("set string", initStringValue, submenu1id);
     m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1id);
@@ -85,6 +85,9 @@ void SetupMenu()
     m.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
     m.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
     m.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
+
+    auto mi = m.getByKey(66);
+    m.addCallbackMenuitem("late created menu", simpleMenu, mi.mid);
 
     strcpy(staticString, "first string");
 }
