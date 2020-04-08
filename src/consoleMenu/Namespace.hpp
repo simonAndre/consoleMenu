@@ -18,7 +18,6 @@
                       CONSOLEMENU_CONCAT4(H, I, J, CONSOLEMENU_CONCAT2(K, L)))
 
 #define CONSOLEMENU_NAMESPACE                                            \
-  CONSOLEMENU_CONCAT12(                                                  \
+  CONSOLEMENU_CONCAT4(                                                   \
       consoleMenu, CONSOLEMENU_VERSION_MAJOR, CONSOLEMENU_VERSION_MINOR, \
-      CONSOLEMENU_VERSION_REVISION, _, CONSOLEMENU_USE_LONG_LONG,        \
-      CONSOLEMENU_USE_DOUBLE, CONSOLEMENU_ENABLE_PROGMEM, , , , )
+      CONSOLEMENU_VERSION_REVISION)

@@ -31,6 +31,7 @@ namespace consoleMenu
 {
 using CONSOLEMENU_NAMESPACE::IoHelpers;
 using CONSOLEMENU_NAMESPACE::Menu;
+using CONSOLEMENU_NAMESPACE::Menuitem;
 using CONSOLEMENU_NAMESPACE::MenuOptions;
 using CONSOLEMENU_NAMESPACE::ushort;
 } // namespace consoleMenu
