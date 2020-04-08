@@ -178,11 +178,11 @@ public:
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
-    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, char *variableToUpdate, size_t stringsize, ushort trials)
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, char *variableToUpdate, size_t stringsize)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_s, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
-        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(_menuoptions.badInputRepeats);
         _menuCollection.at(newmenuitem.mid).SetStringToUpdateSize(stringsize);
         return newmenuitem.mid;
     }
@@ -196,11 +196,11 @@ public:
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
-    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, int *variableToUpdate, ushort trials)
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, int *variableToUpdate)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_i, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
-        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(_menuoptions.badInputRepeats);
         return newmenuitem.mid;
     }
 
@@ -213,11 +213,11 @@ public:
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
-    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, ushort *variableToUpdate, ushort trials)
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, ushort *variableToUpdate)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_us, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
-        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(_menuoptions.badInputRepeats);
         return newmenuitem.mid;
     }
 
@@ -230,11 +230,11 @@ public:
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
-    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, unsigned char *variableToUpdate, ushort trials)
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, unsigned char *variableToUpdate)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_uc, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
-        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(_menuoptions.badInputRepeats);
         return newmenuitem.mid;
     }
     /**
@@ -246,11 +246,11 @@ public:
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
-    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, double *variableToUpdate, ushort trials)
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, double *variableToUpdate)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_d, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
-        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(_menuoptions.badInputRepeats);
         return newmenuitem.mid;
     }
 
