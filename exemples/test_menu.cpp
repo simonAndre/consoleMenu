@@ -49,6 +49,7 @@ enum MyMenuKeys
 
 void SetupMenu()
 {
+
     // declaration,
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
@@ -83,7 +84,7 @@ void SetupMenu()
     m.addCallbackMenuitem("display value int1", displayint1, testinputsid);
     m.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
     m.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
-    m.addUpdaterMenuitem("change bool1", testinputsid, &bool1, 2);
+    m.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
 
     strcpy(staticString, "first string");
 }

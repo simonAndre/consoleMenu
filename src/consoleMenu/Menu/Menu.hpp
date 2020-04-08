@@ -243,22 +243,22 @@ public:
     }
 
     /**
- * @brief add a menu item designed for one goal : update an int value in a given pointer to a variable.
+ * @brief add a menu item designed for one goal : update a bool value in a given pointer to a variable.
+ * depending on the value of CONSOLEMENU_UPDATERMENU_BOOLMODESWITCH, in switch mode : a single call to this menu-item is enough to switch the value
+ * if CONSOLEMENU_UPDATERMENU_BOOLMODESWITCH=0 the user is prompted for the new bool value (0/1 or y/n)
  * 
  * @param menuname
  * @param parentid 
  * @param variableToUpdate : pointer to the variable to be updated
- * @param trials : number of given trials before issuing a failure and exits the assignement loop.
  * @return ushort : menuid created
  */
-    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, bool *variableToUpdate, ushort trials)
+    ushort addUpdaterMenuitem(const char *menuname, ushort parentid, bool *variableToUpdate)
     {
         Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_b, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(newmenuitem.mid).SetVarToUpdate(variableToUpdate);
-        _menuCollection.at(newmenuitem.mid).SetInputTrials(trials);
+        _menuCollection.at(newmenuitem.mid).SetInputTrials(1);
         return newmenuitem.mid;
     }
-
     /**
      * @brief Set  Options for meuns
      * 
@@ -393,6 +393,10 @@ private:
         return 0;
     }
 
+    void _internalAppendDisplay()
+    {
+    }
+
     /**
      * @brief compute the menu rendering given the context
      * for internal recursive calls
@@ -402,59 +406,74 @@ private:
      */
     void displayMenu(ushort hierarchyId, ushort lasthierachyid)
     {
-        std::string display("---------------------\n");
-        ushort ix = 0;
-        std::map<ushort, Menuitem>::iterator it;
-        std::map<ushort, ushort> menuitems;
 
         if (!_isMenuCollectionComplete)
             appendSpecialsMI();
 
-        //add the regular menus items for this hierarchy
-        for (it = _menuCollection.begin(); it != _menuCollection.end(); ++it)
-        {
-            if (it->second.mparentid == hierarchyId ||
-                (it->second.mtype == menutype::back &&                                             // condition for back Menu
-                 _menuoptions.addBack && hierarchyId > 0) ||                                       // condition for back Menu
-                (it->second.mtype == menutype::exit &&                                             // condition for exit Menu
-                 (_menuoptions.addExitForEachLevel || (_menuoptions.addBack && hierarchyId == 0))) // condition for exit Menu
-            )
-            {
-                ix++;
-
-                std::string menuname;
-                if (it->second.mNamingFonction != NULL)
-                {
-                    menuname = it->second.mNamingFonction(it->second.mkey);
-                    it->second.mname = menuname;
-                }
-                else
-                {
-                    menuname = it->second.mname;
-                }
-
-#if CONSOLEMENU_EMBEDDED_MODE
-                char buff[4];
-                sprintf(buff, "%i", ix);
-                display.append(buff).append(_menuoptions.id_separator).append(menuname).append("\n");
-#else
-                display.append(std::to_string(ix)).append(_menuoptions.id_separator).append(menuname).append("\n");
-#endif
-                menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
-            }
-            if (lasthierachyid == CONSOLEMENU_RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId)
-                lasthierachyid = it->second.mparentid;
-        }
-
-        ushort menuitemid;
         bool done = false;
-        display.append("please choose an action: >");
+
         do
         {
+            IoHelpers::IOdisplay("---------------------\n");
+            ushort ix = 0;
+            std::map<ushort, Menuitem>::iterator it;
+            std::map<ushort, ushort> menuitems;
+
+            //add the regular menus items for this hierarchy
+            for (it = _menuCollection.begin(); it != _menuCollection.end(); ++it)
+            {
+                if (it->second.mparentid == hierarchyId ||
+                    (it->second.mtype == menutype::back &&                                             // condition for back Menu
+                     _menuoptions.addBack && hierarchyId > 0) ||                                       // condition for back Menu
+                    (it->second.mtype == menutype::exit &&                                             // condition for exit Menu
+                     (_menuoptions.addExitForEachLevel || (_menuoptions.addBack && hierarchyId == 0))) // condition for exit Menu
+                )
+                {
+                    ix++;
+
+                    std::string menuname;
+                    if (it->second.mNamingFonction != NULL)
+                    {
+                        menuname = it->second.mNamingFonction(it->second.mkey);
+                        it->second.mname = menuname;
+                    }
+                    else
+                    {
+                        menuname = it->second.mname;
+                    }
+
+#if CONSOLEMENU_EMBEDDED_MODE
+                    char buff[4];
+                    sprintf(buff, "%i", ix);
+                    IoHelpers::IOdisplay(buff);
+                    IoHelpers::IOdisplay(_menuoptions.id_separator);
+                    IoHelpers::IOdisplay(menuname.c_str());
+                    IoHelpers::IOdisplay("\n");
+#else
+                    IoHelpers::IOdisplay(ix);
+                    IoHelpers::IOdisplay(_menuoptions.id_separator);
+                    IoHelpers::IOdisplay(menuname.c_str());
+                    if (it->second.isUpdaterMenuItem())
+                    {
+                        IoHelpers::IOdisplay(" [=");
+                        it->second.displayCurrentValue();
+                        IoHelpers::IOdisplay("]");
+                    }
+                    IoHelpers::IOdisplayLn("");
+#endif
+                    menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
+                }
+                if (lasthierachyid == CONSOLEMENU_RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId)
+                    lasthierachyid = it->second.mparentid;
+            }
+
+            ushort menuitemid;
+            IoHelpers::IOdisplay("please choose an action: >");
+
             try
             {
                 ushort inputi = USHRT_MAX;
-                _displayCallback(display.c_str());
+                //redisplay!! TODO
                 if (_inputId != NULL)
                 {
                     inputi = _inputId();
@@ -497,27 +516,27 @@ private:
                     case menutype::externalFunction:
                         _displayCallback("\n");
                         done = callMenuCallbackFunction(mi);
-                        if (!done && mi.mNamingFonction != NULL)
-                        {
-                            //recursive call to display again the menu and reload the menu display callback
-                            displayMenu(hierarchyId, lasthierachyid);
-                            return;
-                        }
-                        if (done)
-                            _displayCallback(">exited\n");
+                        // if (!done && mi.mNamingFonction != NULL)
+                        // {
+                        //     //recursive call to display again the menu and reload the menu display callback
+                        //     displayMenu(hierarchyId, lasthierachyid);
+                        //     return;
+                        // }
+                        // if (done)
+                        // _displayCallback(">exited\n");
                         break;
                     default:
-                        if (mi.mtype >= 50 && mi.mtype <= 60)
+                        if (mi.isUpdaterMenuItem())
                         {
                             done = variableUpdater(mi);
-                            if (!done && mi.mNamingFonction != NULL)
-                            {
-                                //recursive call to display again the menu and reload the menu display callback
-                                displayMenu(hierarchyId, lasthierachyid);
-                                return;
-                            }
-                            if (done)
-                                _displayCallback(">exited\n");
+                            // if (!done && mi.mNamingFonction != NULL)
+                            // {
+                            //     //recursive call to display again the menu and reload the menu display callback
+                            //     displayMenu(hierarchyId, lasthierachyid);
+                            //     return;
+                            // }
+                            // if (done)
+                            //     _displayCallback(">exited\n");
                         }
                         else
                             throw std::runtime_error("this menutype is not implemented");
@@ -530,51 +549,18 @@ private:
                 continue;
             }
         } while (!done);
+        _displayCallback(">exited\n");
     }
 
     bool variableUpdater(Menuitem mi)
     {
         char *vartoupdate_s;
         int vartoupdate_i;
-        switch (mi.mtype)
-        {
-        case menutype::variableUpdater_s:
-            IoHelpers::IOdisplay("current value is : [");
-            IoHelpers::IOdisplay((char *)mi.variableToUpdate);
-            IoHelpers::IOdisplayLn("]");
-            IoHelpers::TakeUserInput("enter new value>", (char *)mi.variableToUpdate, mi.stringToUpdateSize, mi.inputtrials);
-            return false;
-        case menutype::variableUpdater_i:
-            IoHelpers::IOdisplay("current value is : [");
-            IoHelpers::IOdisplay(*(int *)mi.variableToUpdate);
-            IoHelpers::IOdisplayLn("]");
-            IoHelpers::TakeUserInput("enter new value>", (int *)mi.variableToUpdate, mi.inputtrials);
-            return false;
-        case menutype::variableUpdater_us:
-            IoHelpers::IOdisplay("current value is : [");
-            IoHelpers::IOdisplay(*(ushort *)mi.variableToUpdate);
-            IoHelpers::IOdisplayLn("]");
-            IoHelpers::TakeUserInput("enter new value>", (ushort *)mi.variableToUpdate, mi.inputtrials);
-            return false;
-        case menutype::variableUpdater_uc:
-            IoHelpers::IOdisplay("current value is : [");
-            IoHelpers::IOdisplay(*(unsigned char *)mi.variableToUpdate);
-            IoHelpers::IOdisplayLn("]");
-            IoHelpers::TakeUserInput("enter new value>", (unsigned char *)mi.variableToUpdate, mi.inputtrials);
-            return false;
-        case menutype::variableUpdater_d:
-            IoHelpers::IOdisplay("current value is : [");
-            IoHelpers::IOdisplay(*(double *)mi.variableToUpdate);
-            IoHelpers::IOdisplayLn("]");
-            IoHelpers::TakeUserInput("enter new value>", (double *)mi.variableToUpdate, mi.inputtrials);
-            return false;
-        case menutype::variableUpdater_b:
-            IoHelpers::IOdisplay("current value is : [");
-            IoHelpers::IOdisplay(*(bool *)mi.variableToUpdate);
-            IoHelpers::IOdisplayLn("]");
-            IoHelpers::TakeUserInput("enter new value>", (bool *)mi.variableToUpdate, mi.inputtrials);
-            return false;
-        }
+        IoHelpers::IOdisplay("current value is : ");
+        mi.displayCurrentValue();
+        IoHelpers::IOdisplayLn("");
+        mi.takeUserInput();
+        return false;
     }
     /**
  * @brief call the menu function

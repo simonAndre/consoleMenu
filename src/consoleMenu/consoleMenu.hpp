@@ -17,8 +17,8 @@
 #include "Namespace.hpp"
 #include "commontypes.hpp"
 #include "Menu/specialTypes.hpp"
-#include "Menu/Menuitem.hpp"
 #include "IO/IoHelpers.hpp"
+#include "Menu/Menuitem.hpp"
 #include "Menu/Menu.hpp"
 
 #if CONSOLEMENU_EMBEDDED_MODE

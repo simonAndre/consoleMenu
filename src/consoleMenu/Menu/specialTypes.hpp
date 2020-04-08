@@ -30,6 +30,7 @@ typedef bool (*fp_callback2)(const char *);
      */
 typedef bool (*fp_callback3)(ushort, const char *);
 typedef void (*fp_IOdisplay)(const char *);
+
 typedef const char *(*fp_IOinput)(void);
 /**
  * @brief prototype of pointer to a function aiming at listen to an IO input for an id. 
@@ -42,6 +43,7 @@ typedef struct
      bool addBack = true;
      bool addExitForEachLevel = true; //if false and addBack is true : the exist menuitem is only available at the root
      const char *id_separator = " - ";
+     bool addCurrentState = true; // if true : display the current state for each menuitem, for updater menu items only.
 } MenuOptions;
 
 enum menutype
