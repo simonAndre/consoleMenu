@@ -80,9 +80,9 @@ void SetupMenu()
     m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
 
     m.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
-    m.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString), 1);
+    m.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString));
     m.addCallbackMenuitem("display value int1", displayint1, testinputsid);
-    m.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
+    m.addUpdaterMenuitem("change int1", testinputsid, &int1);
     m.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
     m.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
 

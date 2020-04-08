@@ -80,9 +80,9 @@ void setupSerialMenu()
     consolemenu.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
 
     consolemenu.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
-    consolemenu.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString), 1);
+    consolemenu.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString));
     consolemenu.addCallbackMenuitem("display value int1", displayint1, testinputsid);
-    consolemenu.addUpdaterMenuitem("change int1", testinputsid, &int1, 2);
+    consolemenu.addUpdaterMenuitem("change int1", testinputsid, &int1);
     consolemenu.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
     consolemenu.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
 }
