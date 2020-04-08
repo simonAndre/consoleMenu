@@ -83,7 +83,21 @@ public:
         IOdisplay(ivalue);
         IOdisplay("\n");
     }
-
+    static void IOdisplayLn(unsigned int ivalue)
+    {
+        IOdisplay(ivalue);
+        IOdisplay("\n");
+    }
+    static void IOdisplayLn(long ivalue)
+    {
+        IOdisplay(ivalue);
+        IOdisplay("\n");
+    }
+    static void IOdisplayLn(unsigned long ivalue)
+    {
+        IOdisplay(ivalue);
+        IOdisplay("\n");
+    }
     /**
  * @brief diplay a bool value followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
  * 
@@ -132,7 +146,31 @@ public:
         std::cout << ivalue;
 #endif
     }
+    static void IOdisplay(long ivalue)
+    {
+#if CONSOLEMENU_EMBEDDED_MODE
+        Serial.print(ivalue);
+#else
+        std::cout << ivalue;
+#endif
+    }
+    static void IOdisplay(unsigned long ivalue)
+    {
+#if CONSOLEMENU_EMBEDDED_MODE
+        Serial.print(ivalue);
+#else
+        std::cout << ivalue;
+#endif
+    }
 
+    static void IOdisplay(unsigned int ivalue)
+    {
+#if CONSOLEMENU_EMBEDDED_MODE
+        Serial.print(ivalue);
+#else
+        std::cout << ivalue;
+#endif
+    }
     /**
  * @brief diplay a float/double value to the user on the available console (use Serial for embedded devices, std::cout for computers)
  * 
