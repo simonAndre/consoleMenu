@@ -78,14 +78,26 @@ public:
      * 
      * @param menuname 
      * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @param menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique).
+     * @return ushort : menuid created, to reference on the submenu items to setup underneath
+     */
+    ushort addHierarchyMenuitem(const char *menuname, ushort parentid, ushort menukey)
+    {
+        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::hierarchymenu, menukey);
+        return newmenuitem.mid;
+    }
+    /**
+     * @brief add an item heading to a submenu, 
+     * part of the menu setting to be done before calling displayMenu
+     * 
+     * @param menuname 
+     * @param parentid : if this menuitem is under a submenu : id of the parent item.
      * @return ushort : menuid created, to reference on the submenu items to setup underneath
      */
     ushort addHierarchyMenuitem(const char *menuname, ushort parentid)
     {
-        Menuitem newmenuitem = this->addMenuitem_internal(menuname, parentid, menutype::hierarchymenu, CONSOLEMENU_NOMENUKEY);
-        return newmenuitem.mid;
+        return addHierarchyMenuitem(menuname, parentid, CONSOLEMENU_NOMENUKEY);
     }
-
     /**
      * @brief add a menu item calling a given function.
      * part of the menu setting to be done before calling displayMenu
@@ -301,6 +313,24 @@ public:
 #endif
     }
 
+    /**
+ * @brief Get a menuitem the By its menuKey
+ * 
+ * @param menukey 
+ * @return Menuitem 
+ */
+    Menuitem getByKey(ushort menukey)
+    {
+        // std::map<ushort, Menuitem>::iterator it = this->_menuCollection.begin();
+        // do
+        // {
+        //     if (it->second.mkey == menukey)
+        //         return it->second;
+        // } while (it != this->_menuCollection.end());
+        ushort menuid = this->_menukeys.at(menukey);
+        return this->_menuCollection.at(menuid);
+    }
+
 private:
     std::map<ushort, Menuitem> _menuCollection;
     std::map<ushort, ushort> _menukeys; // dictionary of menykeys:menuid
@@ -442,14 +472,6 @@ private:
                         menuname = it->second.mname;
                     }
 
-#if CONSOLEMENU_EMBEDDED_MODE
-                    char buff[4];
-                    sprintf(buff, "%i", ix);
-                    IoHelpers::IOdisplay(buff);
-                    IoHelpers::IOdisplay(_menuoptions.id_separator);
-                    IoHelpers::IOdisplay(menuname.c_str());
-                    IoHelpers::IOdisplay("\n");
-#else
                     IoHelpers::IOdisplay(ix);
                     IoHelpers::IOdisplay(_menuoptions.id_separator);
                     IoHelpers::IOdisplay(menuname.c_str());
@@ -460,7 +482,7 @@ private:
                         IoHelpers::IOdisplay("]");
                     }
                     IoHelpers::IOdisplayLn("");
-#endif
+
                     menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
                 }
                 if (lasthierachyid == CONSOLEMENU_RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId)
