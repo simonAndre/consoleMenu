@@ -13,7 +13,7 @@ private:
 
 public:
     ushort mid;
-    ushort mparentid = 0;
+    Menuitem *mparent = 0;
     ushort mkey = 0; //optional
     std::string mname;
     menutype mtype;
@@ -39,11 +39,11 @@ public:
  * @param menuFonction 
  * @param type 
  */
-    Menuitem(Menu *menuinstance, const char *menuname, ushort id, ushort parentid, menutype type)
+    Menuitem(Menu *menuinstance, const char *menuname, ushort id, Menuitem *parent, menutype type)
     {
         _menuinstance = menuinstance;
         mid = id;
-        mparentid = parentid;
+        mparent = parent;
         mname = std::string(menuname);
         mtype = type;
     }
