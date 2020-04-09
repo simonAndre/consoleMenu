@@ -1,27 +1,29 @@
 #include <iostream>
+#include <array>
 #include <consoleMenu.h>
 #include <typeinfo>
 using namespace std;
 
 //prototypes
-bool initIntValue(const char *menuname);
-bool initStringValue(const char *menuname);
+bool initIntValue();
+bool initStringValue();
 bool DisplayStringValue();
 bool DisplayIntValue();
 bool simpleMenu();
 bool buildInfos();
-bool getVersionMenu(const char *menuname);
+bool getVersionMenu();
 bool switchMenu(ushort menukey, const char *menuname);
 const char *switchMenuDisplay(ushort menukey);
 bool testIO();
 bool displaystr1();
-bool displayint1();
-bool displaybool1();
 
 // variables
 char staticString[30];
 int int1 = 1234;
+float float1 = 5688.5567;
 bool bool1;
+
+Menubase *m;
 
 /*****  stdio functions ********/
 void DisplayInfos(const char *infos)
@@ -37,7 +39,6 @@ ushort WaitforInput()
     return input;
 }
 
-Menu m = Menu();
 // next init form to use custom methods controlling IO display and input
 // Menu m = Menu(DisplayInfos, WaitforInput);
 
@@ -49,7 +50,7 @@ enum MyMenuKeys
 
 void SetupMenu()
 {
-
+    m = new Menu<25>();
     // declaration,
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
@@ -58,36 +59,34 @@ void SetupMenu()
     MenuOptions mo;
     mo.addBack = true;
     mo.addExitForEachLevel = true;
-    m.setOptions(mo);
+    m->setOptions(mo);
 
-    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);  // simple callback without parameter, see function simpleMenu
-    m.addCallbackMenuitem("consoleMenu version", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
-    m.addCallbackMenuitem("test prompted inputs", testIO, 0);        // callback with menu name passed as parameter, see function menuParamName
-    Menuitem *testinputs = m.addHierarchyMenuitem("submenu test inputs", 0);
-    Menuitem *submenu1 = m.addHierarchyMenuitem("Sub menu 1", 0, 66);
-    // level 2 menus, under the item [submenu1]
-    m.addCallbackMenuitem("set string", initStringValue, submenu1);
-    m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1);
-    m.addCallbackMenuitem("set int value", initIntValue, submenu1);
-    m.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1);
-    //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
-    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1, (ushort)MyMenuKeys::switchmenu1);
+    auto root = m->getRootMenu();
+    root->addMenuitemCallback("simple menu, no params", simpleMenu);  // simple callback without parameter, see function simpleMenu
+    root->addMenuitemCallback("consoleMenu version", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
 
-    // more levels can be chained...
-    Menuitem *submenu2 = m.addHierarchyMenuitem("sub menu 2", submenu1);
-    m.addCallbackMenuitem("build infos", buildInfos, submenu2); //still a simple menu
-    //another dynamic menu bind to the same callbacks with a different key
-    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2, (ushort)MyMenuKeys::switchmenu2);
+    root->addMenuitemCallback("test prompted inputs", testIO); // callback with menu name passed as parameter, see function menuParamName
+    MenuitemHierarchy *submenu1 = root->addMenuitemHierarchy("Sub menu 1");
+    MenuitemHierarchy *testinputs = root->addMenuitemHierarchy("submenu test inputs");
+    // // level 2 menus, under the item [submenu1]
+    submenu1->addMenuitemCallback("set string", initStringValue);
+    submenu1->addMenuitemCallback("display string and stay", DisplayStringValue);
+    submenu1->addMenuitemCallback("set int value", initIntValue);
+    submenu1->addMenuitemCallback("display int value and stop", DisplayIntValue);
+    // //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
+    submenu1->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu1, switchMenu);
 
-    m.addCallbackMenuitem("display value str1", displaystr1, testinputs);
-    m.addUpdaterMenuitem("change str1", testinputs, (char *)staticString, sizeof(staticString));
-    m.addCallbackMenuitem("display value int1", displayint1, testinputs);
-    m.addUpdaterMenuitem("change int1", testinputs, &int1);
-    m.addCallbackMenuitem("display value bool1", displaybool1, testinputs);
-    m.addUpdaterMenuitem("change bool1", testinputs, &bool1);
+    // // more levels can be chained...
+    MenuitemHierarchy *submenu2 = submenu1->addMenuitemHierarchy("sub menu 2");
+    submenu2->addMenuitemCallback("build infos", buildInfos); //still a simple menu
+    // //another dynamic menu bind to the same callbacks with a different key
+    submenu2->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu2, switchMenu);
 
-    Menuitem *mi = m.getByKey(66);
-    m.addCallbackMenuitem("late created menu", simpleMenu, mi);
+    testinputs->addMenuitemCallback("display value str1", displaystr1);
+    testinputs->addMenuitemUpdater("change str1", (char *)staticString, sizeof(staticString));
+    testinputs->addMenuitemUpdater("change int1", &int1);
+    testinputs->addMenuitemUpdater("change float1", &float1);
+    testinputs->addMenuitemUpdater("change bool1", &bool1);
 
     strcpy(staticString, "first string");
 }
@@ -95,14 +94,36 @@ void SetupMenu()
 /***********   main   ******************/
 int main()
 {
-    cout << "\n\n";
-    SetupMenu();
+    // IoHelpers::IOdisplayG<const char *>("popo");
+    // IoHelpers::IOdisplayG<int>(54);
+    // auto _displayCallback = (consoleMenu033::fp_IOdisplay)IoHelpers::IOdisplayG<const char *>;
+    // const char *cs = "coucou";
+    // _displayCallback(cs);
+    // _displayCallback("mlkmkl\n");
 
-    // cout << m.getById(2)->mname << '\n';
+    // std::array<Menuitem, 20> itemarray;
+    // Menuitem newmi(&m, "testaddroot", 1, NULL, menutype::rootmenu);
+
+    // itemarray[3] = newmi;
+    // std::cout
+    //     << "size of Menuitem: " << sizeof(Menuitem) << '\n';
+    // std::cout << "size of itemarray: " << itemarray.size() << '\n';
+    // std::cout << "max_size of itemarray: " << itemarray.max_size() << '\n';
+
+    cout
+        << "\n\n";
+    SetupMenu();
+    cout << "size menu : " << m->size() << '\n';
+
+    // for (size_t i = 1; i < 10; i++)
+    // {
+    //     cout << i << " -> " << m.getById(i)->mname << '\n';
+    // }
+
     // m.displayMenu(0);
 
     // display the root menu
-    m.launchMenu();
+    m->launchMenu();
 
     return 0;
 }
@@ -125,17 +146,14 @@ bool buildInfos()
     cout << "come back to the menu" << '\n';
     return false;
 }
-bool getVersionMenu(const char *menuname)
+bool getVersionMenu()
 {
-    cout << "callback menu called with the menu display name as param: " << menuname << '\n';
-    char *version = m.getVersion();
-    cout
-        << "current consoleMenu version: " << version << '\n';
+    cout << "current consoleMenu version: " << m->getVersion() << '\n';
     return false;
 }
 
 int _intvalue;
-bool initIntValue(const char *menuname)
+bool initIntValue()
 {
     cout << "enter an int value:";
     try
@@ -150,7 +168,7 @@ bool initIntValue(const char *menuname)
     return false;
 }
 string _cstringvalue("-");
-bool initStringValue(const char *menuname)
+bool initStringValue()
 {
     cout << "enter an string value:";
     try
@@ -239,15 +257,5 @@ bool testIO()
 bool displaystr1()
 {
     IoHelpers::IOdisplayLn(staticString);
-    return false;
-}
-bool displayint1()
-{
-    IoHelpers::IOdisplayLn(int1);
-    return false;
-}
-bool displaybool1()
-{
-    IoHelpers::IOdisplayLn(bool1);
     return false;
 }

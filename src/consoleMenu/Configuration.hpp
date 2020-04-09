@@ -33,3 +33,7 @@
 #define CONSOLEMENU_MENU_BACK "< back"
 #define CONSOLEMENU_MENU_EXITED ">exited\n"
 #define CONSOLEMENU_MENU_CHOOSEACTION "please choose an action: >"
+#define CONSOLEMENU_MENU_OVERSIZEINPUT "oversize input, try again."
+
+#define CONSOLEMENU_NOMENUKEY 9999
+#define CONSOLEMENU_RECOMPUTEPARENT 9999

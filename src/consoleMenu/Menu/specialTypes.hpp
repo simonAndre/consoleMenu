@@ -49,6 +49,7 @@ typedef struct
 
 enum menutype
 {
+     rootmenu, //only one root menu
      externalFunction,
      exit, //exit the menu
      back, //back to the parent menuitem

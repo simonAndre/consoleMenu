@@ -64,68 +64,13 @@ public:
     ~IoHelpers() {}
 
     /**
- * @brief diplay a message followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
-    static void IOdisplayLn(const char *infos)
-    {
-        IOdisplay(infos);
-        IOdisplay("\n");
-    }
-    /**
- * @brief diplay an int value followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
-    static void IOdisplayLn(int ivalue)
-    {
-        IOdisplay(ivalue);
-        IOdisplay("\n");
-    }
-    static void IOdisplayLn(unsigned int ivalue)
-    {
-        IOdisplay(ivalue);
-        IOdisplay("\n");
-    }
-    static void IOdisplayLn(long ivalue)
-    {
-        IOdisplay(ivalue);
-        IOdisplay("\n");
-    }
-    static void IOdisplayLn(unsigned long ivalue)
-    {
-        IOdisplay(ivalue);
-        IOdisplay("\n");
-    }
-    /**
- * @brief diplay a bool value followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
-    static void IOdisplayLn(bool value)
-    {
-        IOdisplay(value);
-        IOdisplay("\n");
-    }
-
-    /**
- * @brief diplay a float/double value followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
-    static void IOdisplayLn(double fvalue)
-    {
-        IOdisplay(fvalue);
-        IOdisplay("\n");
-    }
-
-    /**
  * @brief diplay a message to the user on the available console (use Serial for embedded devices, std::cout for computers)
  * 
+ * @tparam T 
  * @param infos 
  */
-    static void IOdisplay(const char *infos)
+    template <typename T>
+    static void IOdisplay(T infos)
     {
 #if CONSOLEMENU_EMBEDDED_MODE
         Serial.print(infos);
@@ -133,63 +78,7 @@ public:
         std::cout << infos;
 #endif
     }
-    /**
- * @brief diplay an int value to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
-    static void IOdisplay(int ivalue)
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        Serial.print(ivalue);
-#else
-        std::cout << ivalue;
-#endif
-    }
-    static void IOdisplay(long ivalue)
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        Serial.print(ivalue);
-#else
-        std::cout << ivalue;
-#endif
-    }
-    static void IOdisplay(unsigned long ivalue)
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        Serial.print(ivalue);
-#else
-        std::cout << ivalue;
-#endif
-    }
 
-    static void IOdisplay(unsigned int ivalue)
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        Serial.print(ivalue);
-#else
-        std::cout << ivalue;
-#endif
-    }
-    /**
- * @brief diplay a float/double value to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
-    static void IOdisplay(double fvalue)
-    {
-#if CONSOLEMENU_EMBEDDED_MODE
-        Serial.print(fvalue);
-#else
-        std::cout << fvalue;
-#endif
-    }
-
-    /**
- * @brief diplay a bool value to the user on the available console (use Serial for embedded devices, std::cout for computers)
- * 
- * @param infos 
- */
     static void IOdisplay(bool bvalue)
     {
 #if CONSOLEMENU_EMBEDDED_MODE
@@ -202,6 +91,22 @@ public:
             std::cout << CONSOLEMENU_DISPLAYFORBOOLVALUE_TRUE;
         else
             std::cout << CONSOLEMENU_DISPLAYFORBOOLVALUE_FALSE;
+#endif
+    }
+
+    /**
+ * @brief diplay a message followed by a carriage return to the user on the available console (use Serial for embedded devices, std::cout for computers)
+ * 
+ * @tparam T 
+ * @param infos 
+ */
+    template <typename T>
+    static void IOdisplayLn(const T &infos)
+    {
+#if CONSOLEMENU_EMBEDDED_MODE
+        Serial.println(infos);
+#else
+        std::cout << infos << '\n';
 #endif
     }
 
@@ -234,7 +139,6 @@ public:
                 }
                 else
                 {
-                    IOdisplayLn("oversize input.");
                     return false;
                 }
             }
@@ -254,7 +158,6 @@ public:
         }
         else
         {
-            IOdisplayLn("oversize input.");
             return false;
         }
     }
@@ -275,6 +178,7 @@ public:
         ushort t = 0;
         while (!WaitforInput(outstring, stringbuffersize) && t++ < trials)
         {
+            IOdisplayLn(CONSOLEMENU_MENU_OVERSIZEINPUT);
         }
         if (t < trials)
             return true;
@@ -337,6 +241,7 @@ public:
             return true;
         }
     }
+
     /**
  * @brief bool input code as  0 / 1 or y / n
  * 
@@ -375,6 +280,18 @@ public:
  * @return false : input failure, expiration of the given trials, don't use the outnumber pointer.
  */
     static bool TakeUserInput(const char *promptmessage, double *outnumber, ushort trials)
+    {
+        ushort double_nbdigitmax = 15;
+        char userstring[double_nbdigitmax];
+        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials))
+        {
+            *outnumber = atof(userstring);
+            return true;
+        }
+        else
+            return false;
+    }
+    static bool TakeUserInput(const char *promptmessage, float *outnumber, ushort trials)
     {
         ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];
