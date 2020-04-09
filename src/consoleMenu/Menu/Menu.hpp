@@ -80,13 +80,13 @@ public:
      * part of the menu setting to be done before calling displayMenu
      * 
      * @param menuname 
-     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @param parent : used in a submenu to link this menuitem with ites parent.
      * @param menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique).
-     * @return ushort : menuid created, to reference on the submenu items to setup underneath
+     * @return Menuitem : menu-item created, to reference on the submenu items to setup underneath
      */
-    Menuitem addHierarchyMenuitem(const char *menuname, ushort parentid, ushort menukey)
+    Menuitem addHierarchyMenuitem(const char *menuname, Menuitem *parent, ushort menukey)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::hierarchymenu, menukey);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::hierarchymenu, menukey);
         return _menuCollection.at(id);
     }
     /**
@@ -94,12 +94,12 @@ public:
      * part of the menu setting to be done before calling displayMenu
      * 
      * @param menuname 
-     * @param parentid : if this menuitem is under a submenu : id of the parent item.
-     * @return ushort : menuid created, to reference on the submenu items to setup underneath
+     * @param parent : used in a submenu to link this menuitem with ites parent.
+     * @return Menuitem : menu-item created, to reference on the submenu items to setup underneath
      */
-    Menuitem addHierarchyMenuitem(const char *menuname, ushort parentid)
+    Menuitem addHierarchyMenuitem(const char *menuname, Menuitem *parent)
     {
-        return addHierarchyMenuitem(menuname, parentid, CONSOLEMENU_NOMENUKEY);
+        return addHierarchyMenuitem(menuname, parent, CONSOLEMENU_NOMENUKEY);
     }
     /**
      * @brief add a menu item calling a given function.
@@ -107,12 +107,12 @@ public:
      * 
      * @param menuname 
      * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
-     * @param parentid : if this menuitem is under a submenu : id of the parent item.
-     * @return ushort : menuid created
+     * @param parent : used in a submenu to link this menuitem with ites parent.
+     * @return Menuitem : menu-item created
      */
-    Menuitem addCallbackMenuitem(const char *menuname, fp_callback1 menuFonction, ushort parentid)
+    Menuitem addCallbackMenuitem(const char *menuname, fp_callback1 menuFonction, Menuitem *parent)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetCallback(menuFonction);
         return _menuCollection.at(id);
     }
@@ -123,12 +123,12 @@ public:
      * 
      * @param menuname 
      * @param menuFonction : pointer to the function to call for this menu. if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
-     * @param parentid : if this menuitem is under a submenu : id of the parent item.
-     * @return ushort : menuid created
+     * @param parent : used in a submenu to link this menuitem with ites parent.
+     * @return Menuitem : menu-item created
      */
-    Menuitem addCallbackMenuitem(const char *menuname, fp_callback2 menuFonction, ushort parentid)
+    Menuitem addCallbackMenuitem(const char *menuname, fp_callback2 menuFonction, Menuitem *parent)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetCallback(menuFonction);
         return _menuCollection.at(id);
     }
@@ -139,14 +139,14 @@ public:
      * 
      * @param menuname 
      * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
-     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @param parent : used in a submenu to link this menuitem with ites parent.
      * @param menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique).
      * this key is passed back to the callback
-     * @return ushort : menuid created
+     * @return Menuitem : menu-item created
      */
-    Menuitem addCallbackMenuitem(const char *menuname, fp_callback3 menuFonction, ushort parentid, ushort menukey)
+    Menuitem addCallbackMenuitem(const char *menuname, fp_callback3 menuFonction, Menuitem *parent, ushort menukey)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::externalFunction, menukey);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::externalFunction, menukey);
         _menuCollection.at(id).SetCallback(menuFonction);
         return _menuCollection.at(id);
     }
@@ -158,13 +158,13 @@ public:
      * 
      * @param menunamefunction : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
      * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
-     * @param parentid : if this menuitem is under a submenu : id of the parent item.
+     * @param parent : used in a submenu to link this menuitem with ites parent.
      * @param menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique).
-     * @return ushort : menuid created
+     * @return Menuitem : menu-item created
      */
-    Menuitem addDynamicCallbackMenuitem(fp_namingcallback menunamefunction, fp_callback3 menuFonction, ushort parentid, ushort menukey)
+    Menuitem addDynamicCallbackMenuitem(fp_namingcallback menunamefunction, fp_callback3 menuFonction, Menuitem *parent, ushort menukey)
     {
-        ushort id = this->addMenuitem_internal("", parentid, menutype::externalFunction, menukey);
+        ushort id = this->addMenuitem_internal("", parent, menutype::externalFunction, menukey);
         _menuCollection.at(id).SetCallback(menuFonction);
         _menuCollection.at(id).SetNamingCallback(menunamefunction);
         return _menuCollection.at(id);
@@ -178,11 +178,11 @@ public:
  * @param variableToUpdate : pointer to the variable to be updated
  * @param stringsize : size max of the c-string (buffer of char)
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
- * @return ushort : menuid created
+ * @return Menuitem : menu-item created
  */
-    Menuitem addUpdaterMenuitem(const char *menuname, ushort parentid, char *variableToUpdate, size_t stringsize)
+    Menuitem addUpdaterMenuitem(const char *menuname, Menuitem *parent, char *variableToUpdate, size_t stringsize)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_s, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::variableUpdater_s, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetVarToUpdate(variableToUpdate);
         _menuCollection.at(id).SetInputTrials(_menuoptions.badInputRepeats);
         _menuCollection.at(id).SetStringToUpdateSize(stringsize);
@@ -196,11 +196,11 @@ public:
  * @param parentid 
  * @param variableToUpdate : pointer to the variable to be updated
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
- * @return ushort : menuid created
+ * @return Menuitem : menu-item created
  */
-    Menuitem addUpdaterMenuitem(const char *menuname, ushort parentid, int *variableToUpdate)
+    Menuitem addUpdaterMenuitem(const char *menuname, Menuitem *parent, int *variableToUpdate)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_i, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::variableUpdater_i, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetVarToUpdate(variableToUpdate);
         _menuCollection.at(id).SetInputTrials(_menuoptions.badInputRepeats);
         return _menuCollection.at(id);
@@ -213,11 +213,11 @@ public:
  * @param parentid 
  * @param variableToUpdate : pointer to the variable to be updated
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
- * @return ushort : menuid created
+ * @return Menuitem : menu-item created
  */
-    Menuitem addUpdaterMenuitem(const char *menuname, ushort parentid, ushort *variableToUpdate)
+    Menuitem addUpdaterMenuitem(const char *menuname, Menuitem *parent, ushort *variableToUpdate)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_us, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::variableUpdater_us, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetVarToUpdate(variableToUpdate);
         _menuCollection.at(id).SetInputTrials(_menuoptions.badInputRepeats);
         return _menuCollection.at(id);
@@ -230,11 +230,11 @@ public:
  * @param parentid 
  * @param variableToUpdate : pointer to the variable to be updated
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
- * @return ushort : menuid created
+ * @return Menuitem : menu-item created
  */
-    Menuitem addUpdaterMenuitem(const char *menuname, ushort parentid, unsigned char *variableToUpdate)
+    Menuitem addUpdaterMenuitem(const char *menuname, Menuitem *parent, unsigned char *variableToUpdate)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_uc, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::variableUpdater_uc, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetVarToUpdate(variableToUpdate);
         _menuCollection.at(id).SetInputTrials(_menuoptions.badInputRepeats);
         return _menuCollection.at(id);
@@ -246,11 +246,11 @@ public:
  * @param parentid 
  * @param variableToUpdate : pointer to the variable to be updated
  * @param trials : number of given trials before issuing a failure and exits the assignement loop.
- * @return ushort : menuid created
+ * @return Menuitem : menu-item created
  */
-    Menuitem addUpdaterMenuitem(const char *menuname, ushort parentid, double *variableToUpdate)
+    Menuitem addUpdaterMenuitem(const char *menuname, Menuitem *parent, double *variableToUpdate)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_d, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::variableUpdater_d, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetVarToUpdate(variableToUpdate);
         _menuCollection.at(id).SetInputTrials(_menuoptions.badInputRepeats);
         return _menuCollection.at(id);
@@ -264,11 +264,11 @@ public:
  * @param menuname
  * @param parentid 
  * @param variableToUpdate : pointer to the variable to be updated
- * @return ushort : menuid created
+ * @return Menuitem : menu-item created
  */
-    Menuitem addUpdaterMenuitem(const char *menuname, ushort parentid, bool *variableToUpdate)
+    Menuitem addUpdaterMenuitem(const char *menuname, Menuitem *parent, bool *variableToUpdate)
     {
-        ushort id = this->addMenuitem_internal(menuname, parentid, menutype::variableUpdater_b, CONSOLEMENU_NOMENUKEY);
+        ushort id = this->addMenuitem_internal(menuname, parent, menutype::variableUpdater_b, CONSOLEMENU_NOMENUKEY);
         _menuCollection.at(id).SetVarToUpdate(variableToUpdate);
         _menuCollection.at(id).SetInputTrials(1);
         return _menuCollection.at(id);
@@ -353,19 +353,19 @@ private:
         insertSpecialsMI();
     }
 
-    ushort addMenuitem_internal(const char *menuname, ushort parentid, menutype mtype, ushort menukey)
+    ushort addMenuitem_internal(const char *menuname, Menuitem *parent, menutype mtype, ushort menukey)
     {
-        if (parentid > 0)
+        if (parent != NULL)
         {
-            if (_menuCollection.find(parentid) == _menuCollection.end())
+            if (_menuCollection.find(parent->mid) == _menuCollection.end())
             {
                 char err[50];
-                sprintf(err, "Parent Linking error : no menu item found in the menuitem collection with id %i", parentid);
+                sprintf(err, "Parent Linking error : no menu item found in the menuitem collection with id %i", parent->mid);
                 throw std::runtime_error(err);
             }
         }
         ushort itemid = _menuCollection.size() + 1;
-        Menuitem newmenuitem(this, menuname, itemid, parentid, mtype);
+        Menuitem newmenuitem(this, menuname, itemid, parent->mid, mtype);
         newmenuitem.mkey = menukey;
         if (menukey != CONSOLEMENU_NOMENUKEY)
         {
