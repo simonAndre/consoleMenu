@@ -9,6 +9,9 @@ all: exemple
 $(EXEC): ./*.cpp
 	$(CC) -o ./$(EXEC) ./*.cpp $(IFLAGS) $(CXXFLAGS)
 
+run: $(EXEC)
+	$(EXEC).exe
+
 all: $(EXEC)
 
 clean: 
