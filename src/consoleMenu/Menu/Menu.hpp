@@ -76,7 +76,7 @@ public:
 
     /**
      * @brief add an item heading to a submenu, 
-     * part of the menu setting to be done before calling displayMenu
+     * part of the menu setting to be done before calling launchMenu
      * 
      * @param menuname 
      * @param parent : used in a submenu to link this menuitem with ites parent.
@@ -90,7 +90,7 @@ public:
     }
     /**
      * @brief add an item heading to a submenu, 
-     * part of the menu setting to be done before calling displayMenu
+     * part of the menu setting to be done before calling launchMenu
      * 
      * @param menuname 
      * @param parent : used in a submenu to link this menuitem with ites parent.
@@ -102,7 +102,7 @@ public:
     }
     /**
      * @brief add a menu item calling a given function.
-     * part of the menu setting to be done before calling displayMenu
+     * part of the menu setting to be done before calling launchMenu
      * 
      * @param menuname 
      * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
@@ -118,7 +118,7 @@ public:
 
     /**
      * @brief add a menu item calling a given function.
-     * part of the menu setting to be done before calling displayMenu
+     * part of the menu setting to be done before calling launchMenu
      * 
      * @param menuname 
      * @param menuFonction : pointer to the function to call for this menu. if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
@@ -134,7 +134,7 @@ public:
     /**
      * @brief add a menu item calling a given function. This overload let you use a menu key to uniquely identify your menu and treat it specially in your callback. 
      * It can be a mean to group several callbacks into on function.
-     * part of the menu setting to be done before calling displayMenu
+     * part of the menu setting to be done before calling launchMenu
      * 
      * @param menuname 
      * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
@@ -153,7 +153,7 @@ public:
     /**
      * @brief add a menu item calling a given function. This overload let you use a menu key to uniquely identify your menu and treat it specially in your callback. 
      * It can be a mean to group several callbacks into on function.
-     * part of the menu setting to be done before calling displayMenu
+     * part of the menu setting to be done before calling launchMenu
      * 
      * @param menunamefunction : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
      * @param menuFonction : pointer to the function to call for this menu. NULL for a hierarchy menu. if if the return value of the callback is true : exit the menu after execution of this function, else stay in the current menu and wait for another action
@@ -286,14 +286,14 @@ public:
      * @brief  get the string (as a char array) to display the menu for the current hierarchy
      * 
      */
-    void displayMenu()
+    void launchMenu()
     {
-        displayMenu(0, 0);
+        launchMenu(0, 0);
     }
 
     /**
      * @brief to call in the main loop : listen to an input from the serial UI and react displaying the root menu
-     * this method can be implemnted in your code, in this case, call Menu::displayMenu() when you want to display the root menu.
+     * this method can be implemnted in your code, in this case, call Menu::launchMenu() when you want to display the root menu.
      * currently only implemented for arduino
      */
     void LoopCheckSerial()
@@ -304,7 +304,7 @@ public:
             Serial.flush();
             // enter serial menu:
             this->_isserialmenuative = true;
-            displayMenu();
+            launchMenu();
             /**
          * while displaying console menu, the process loop on the user input, it is a sync process TODO : make it async
          */
@@ -324,6 +324,22 @@ public:
     {
         ushort menuid = this->_menukeys.at(menukey);
         return &(this->_menuCollection.at(menuid));
+    }
+
+    Menuitem *getById(ushort menuid)
+    {
+        return &(this->_menuCollection.at(menuid));
+    }
+
+    size_t size()
+    {
+        this->_menuCollection.size();
+    }
+
+    void displayMenu(ushort hierarchyId)
+    {
+        ushort *lasthierachyid = NULL;
+        displayMenu(hierarchyId, lasthierachyid);
     }
 
 private:
@@ -385,7 +401,7 @@ private:
     {
         _menuCollection.insert(std::pair<ushort, Menuitem>(
             1,
-            Menuitem(this, "< back", 1, NULL, menutype::back)));
+            Menuitem(this, CONSOLEMENU_MENU_BACK, 1, NULL, menutype::back)));
     }
 
     /**
@@ -398,7 +414,7 @@ private:
         itemid++;
         _menuCollection.insert(std::pair<ushort, Menuitem>(
             itemid,
-            Menuitem(this, "> exit", itemid, NULL, menutype::exit)));
+            Menuitem(this, CONSOLEMENU_MENU_EXIT, itemid, NULL, menutype::exit)));
 
         _isMenuCollectionComplete = true;
     }
@@ -418,8 +434,54 @@ private:
         return 0;
     }
 
-    void _internalAppendDisplay()
+    //pour l'isntant retourne les menuitems TODO : alimenter cette liste en global
+    std::map<ushort, ushort> displayMenu(ushort hierarchyId, ushort *lasthierachyid)
     {
+        IoHelpers::IOdisplay(CONSOLEMENU_MENU_HEADERLINE);
+        ushort ix = 0;
+        std::map<ushort, Menuitem>::iterator it;
+        std::map<ushort, ushort> menuitems;
+
+        //add the regular menus items for this hierarchy
+        for (it = _menuCollection.begin(); it != _menuCollection.end(); ++it)
+        {
+            if ((it->second.mparent != NULL && it->second.mparent->mid == hierarchyId) ||
+                (it->second.mtype == menutype::back &&                                             // condition for back Menu
+                 _menuoptions.addBack && hierarchyId > 0) ||                                       // condition for back Menu
+                (it->second.mtype == menutype::exit &&                                             // condition for exit Menu
+                 (_menuoptions.addExitForEachLevel || (_menuoptions.addBack && hierarchyId == 0))) // condition for exit Menu
+            )
+            {
+                ix++;
+
+                std::string menuname;
+                if (it->second.mNamingFonction != NULL)
+                {
+                    menuname = it->second.mNamingFonction(it->second.mkey);
+                    it->second.mname = menuname;
+                }
+                else
+                {
+                    menuname = it->second.mname;
+                }
+
+                IoHelpers::IOdisplay(ix);
+                IoHelpers::IOdisplay(_menuoptions.id_separator);
+                IoHelpers::IOdisplay(menuname.c_str());
+                if (it->second.isUpdaterMenuItem())
+                {
+                    IoHelpers::IOdisplay(" [=");
+                    it->second.displayCurrentValue();
+                    IoHelpers::IOdisplay("]");
+                }
+                IoHelpers::IOdisplayLn("");
+
+                menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
+            }
+            if (lasthierachyid != NULL && *lasthierachyid == CONSOLEMENU_RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId && it->second.mparent != NULL)
+                *lasthierachyid = it->second.mparent->mid;
+        }
+        return menuitems;
     }
 
     /**
@@ -429,7 +491,7 @@ private:
      * @param hierarchyId 
      * @param lasthierachyid 
      */
-    void displayMenu(ushort hierarchyId, ushort lasthierachyid)
+    void launchMenu(ushort hierarchyId, ushort lasthierachyid)
     {
 
         if (!_isMenuCollectionComplete)
@@ -439,53 +501,10 @@ private:
 
         do
         {
-            IoHelpers::IOdisplay("---------------------\n");
-            ushort ix = 0;
-            std::map<ushort, Menuitem>::iterator it;
-            std::map<ushort, ushort> menuitems;
-
-            //add the regular menus items for this hierarchy
-            for (it = _menuCollection.begin(); it != _menuCollection.end(); ++it)
-            {
-                if ((it->second.mparent != NULL && it->second.mparent->mid == hierarchyId) ||
-                    (it->second.mtype == menutype::back &&                                             // condition for back Menu
-                     _menuoptions.addBack && hierarchyId > 0) ||                                       // condition for back Menu
-                    (it->second.mtype == menutype::exit &&                                             // condition for exit Menu
-                     (_menuoptions.addExitForEachLevel || (_menuoptions.addBack && hierarchyId == 0))) // condition for exit Menu
-                )
-                {
-                    ix++;
-
-                    std::string menuname;
-                    if (it->second.mNamingFonction != NULL)
-                    {
-                        menuname = it->second.mNamingFonction(it->second.mkey);
-                        it->second.mname = menuname;
-                    }
-                    else
-                    {
-                        menuname = it->second.mname;
-                    }
-
-                    IoHelpers::IOdisplay(ix);
-                    IoHelpers::IOdisplay(_menuoptions.id_separator);
-                    IoHelpers::IOdisplay(menuname.c_str());
-                    if (it->second.isUpdaterMenuItem())
-                    {
-                        IoHelpers::IOdisplay(" [=");
-                        it->second.displayCurrentValue();
-                        IoHelpers::IOdisplay("]");
-                    }
-                    IoHelpers::IOdisplayLn("");
-
-                    menuitems.insert(std::pair<ushort, ushort>(ix, it->second.mid));
-                }
-                if (lasthierachyid == CONSOLEMENU_RECOMPUTEPARENT && it->second.mtype == menutype::hierarchymenu && it->first == hierarchyId && it->second.mparent != NULL)
-                    lasthierachyid = it->second.mparent->mid;
-            }
+            std::map<ushort, ushort> menuitems = displayMenu(hierarchyId, &lasthierachyid);
 
             ushort menuitemid;
-            IoHelpers::IOdisplay("please choose an action: >");
+            IoHelpers::IOdisplay(CONSOLEMENU_MENU_CHOOSEACTION);
 
             try
             {
@@ -521,14 +540,14 @@ private:
                     case menutype::hierarchymenu:
                         _displayCallback("\n");
                         //recursive call to display the underlying menu
-                        displayMenu(it2->first, hierarchyId);
+                        launchMenu(it2->first, hierarchyId);
                         return;
                     case menutype::back:
                         _displayCallback("\n");
-                        displayMenu(lasthierachyid, CONSOLEMENU_RECOMPUTEPARENT);
+                        launchMenu(lasthierachyid, CONSOLEMENU_RECOMPUTEPARENT);
                         return;
                     case menutype::exit:
-                        _displayCallback(">exited\n");
+                        done = true;
                         return;
                     case menutype::externalFunction:
                         _displayCallback("\n");
@@ -550,7 +569,7 @@ private:
                 continue;
             }
         } while (!done);
-        _displayCallback(">exited\n");
+        _displayCallback(CONSOLEMENU_MENU_EXITED);
     }
 
     bool variableUpdater(Menuitem mi)

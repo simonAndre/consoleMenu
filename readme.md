@@ -20,8 +20,16 @@ work on a callback basis : each call to a memnu item is linked to a simple callb
   + linux : `make all`
   + windows : `mingw32-make all`
 + exemple :
-  + build tu test via the makefile : `make test`
-  + run the test : `./test.exe`
+  + build the exemple via the makefile : `make exemple`
+  + run the exemple : `./exemple` or `./exemple.exe`
++ unit tests:
+  + on the first run:
+    + linux : `make tests-prep`
+    + windows : `mingw32-make tests-prep`
+  + for each neq test run:
+    + linux : `make tests`
+    + windows : `mingw32-make tests`  
+  + WIP
 
 ## exemple of rendering : 
 
@@ -101,19 +109,19 @@ Menu m(DisplayInfos, WaitforInput, menuoptions);
     m.addCallbackMenuitem("late created menu", simpleMenu, mi.mid);
 
 //and display the root menu
-m.displayMenu();
+m.launchMenu();
 ```
 
 ### call the menu to render
 
-simply use Menu::displayMenu() this call will exit when the user make his choice and the callback give the control back to the main program flow.
+simply use Menu::launchMenu() this call will exit when the user make his choice and the callback give the control back to the main program flow.
 
 #### method 1
 
 suitable on a computer or in a specific embedded method):
 
 ```C++
-m.displayMenu();
+m.launchMenu();
 ```
 
 #### method 2
@@ -130,7 +138,7 @@ consolemenu.LoopCheckSerial();
 simple function based on one of the following prototypes. 
 choosing one prototype or another is up to you depending on your implementation choices.
 For all of these prototypes, the return bool value is meant to signal a menu exit  :
-+ if its **true** : the menu is exited just after the callback and the control flow is resumed right after the Menu::displayMenu() method (or the Menu::LoopCheckSerial() method).
++ if its **true** : the menu is exited just after the callback and the control flow is resumed right after the Menu::launchMenu() method (or the Menu::LoopCheckSerial() method).
 + if its **false** : the menu is reloaded just after the callback to let the user select another menu option. 
 
 #### form 1
