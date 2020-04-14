@@ -55,7 +55,7 @@ public:
 
     virtual Menuitem *getById(ushort menuid) {}
 
-    virtual size_t size() {}
+    virtual ushort size() {}
 
     virtual void displayMenu(MenuitemHierarchy *parent) {}
 

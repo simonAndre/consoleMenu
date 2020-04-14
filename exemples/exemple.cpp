@@ -50,7 +50,7 @@ enum MyMenuKeys
 
 void SetupMenu()
 {
-    m = new Menu<25>();
+    m = new Menu<18>();
     // declaration,
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
