@@ -1,5 +1,8 @@
 # consoleMenu, a simple console UI hierarchy menu
 
+** to updte to the 0.4.1 version breaking changes **
+
+
 (c) Simon ANDRE, 2019
 
 target : any environment : embedded, linux or windows.
