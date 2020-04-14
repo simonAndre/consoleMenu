@@ -122,9 +122,9 @@ public:
         return _menuArray[menuid];
     }
 
-    virtual size_t size() override
+    virtual ushort size() override
     {
-        this->_menuArray.size();
+        this->_lastmenuindex;
     }
 
     virtual void displayMenu(MenuitemHierarchy *parent) override
@@ -150,7 +150,7 @@ private:
 
     bool insertMewMenuitem(Menuitem *mi)
     {
-        if (_lastmenuindex > sizeMenu)
+        if (_lastmenuindex > sizeMenu + 2)
         {
             memset(_errorbuffer, 0, sizeof _errorbuffer);
             sprintf(_errorbuffer, "too many items for this menu collection, try to increase the template parameter [sizeMenu], current value is : %i", sizeMenu);
