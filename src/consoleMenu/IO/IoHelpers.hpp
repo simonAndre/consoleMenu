@@ -1,6 +1,7 @@
-#pragma once
-
 #include <string.h>
+#include <iostream>
+#include "../commontypes.h"
+#include "../Configuration.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {
@@ -209,7 +210,7 @@ public:
  */
     static bool TakeUserInput(const char *promptmessage, int *outnumber, ushort trials)
     {
-        ushort int_nbdigitmax = 10;
+        const ushort int_nbdigitmax = 10;
         char userstring[int_nbdigitmax + 1];
         if (_takeUserInputPrim(promptmessage, testint, userstring, int_nbdigitmax, trials))
         {
@@ -253,7 +254,7 @@ public:
  */
     static bool TakeUserInput(const char *promptmessage, bool *outvalue, ushort trials)
     {
-        ushort siz = 2;
+        const ushort siz = 2;
         char userstring[siz];
         if (_takeUserInputPrim(promptmessage, testbool, userstring, siz, trials))
         {
@@ -281,7 +282,7 @@ public:
  */
     static bool TakeUserInput(const char *promptmessage, double *outnumber, ushort trials)
     {
-        ushort double_nbdigitmax = 15;
+        const ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];
         if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials))
         {
@@ -293,7 +294,7 @@ public:
     }
     static bool TakeUserInput(const char *promptmessage, float *outnumber, ushort trials)
     {
-        ushort double_nbdigitmax = 15;
+        const ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];
         if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials))
         {

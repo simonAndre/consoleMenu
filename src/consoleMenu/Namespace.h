@@ -2,9 +2,8 @@
 
 #pragma once
 
-// #include <consoleMenu/Configuration.hpp>
-// #include <consoleMenu/version.hpp>
-#include "../version.hpp"
+// #include <consoleMenu/Configuration.h>
+#include "../version.h"
 
 #define CONSOLEMENU_DO_CONCAT(A, B) A##B
 #define CONSOLEMENU_CONCAT2(A, B) CONSOLEMENU_DO_CONCAT(A, B)

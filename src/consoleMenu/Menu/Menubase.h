@@ -1,17 +1,13 @@
 
 #pragma once
 
-#include <string.h>
-#include "specialTypes.hpp"
-
+#include "specialTypes.h"
 namespace CONSOLEMENU_NAMESPACE
 {
-//forward declaration
-class Menuitem;
-class MenuitemBack;
-class MenuitemHierarchy;
 
-static char _consolemenuversion[10];
+// forward declarations
+class Menuitem;
+class MenuitemHierarchy;
 
 class Menubase
 {
@@ -19,48 +15,32 @@ protected:
     MenuOptions _menuoptions;
 
 public:
-    Menubase() {}
-    Menubase(MenuOptions options)
-    {
-        _menuoptions = options;
-    }
-    virtual void setOptions(MenuOptions options)
-    {
-        _menuoptions = options;
-    }
-    virtual MenuOptions getOptions()
-    {
-        return _menuoptions;
-    }
+    Menubase();
+    Menubase(MenuOptions options);
+    virtual void setOptions(MenuOptions options);
+    virtual MenuOptions getOptions();
 
-    virtual char *getVersion()
-    {
-        sprintf(_consolemenuversion, "%i.%i.%i", CONSOLEMENU_VERSION_MAJOR, CONSOLEMENU_VERSION_MINOR, CONSOLEMENU_VERSION_REVISION);
-        return _consolemenuversion;
-    }
+    static char *getVersion();
 
-    virtual MenuitemHierarchy *getRootMenu()
-    {
-        return NULL;
-    }
+    virtual MenuitemHierarchy *getRootMenu();
 
-    virtual bool addChild(MenuitemHierarchy *parent, Menuitem *child) {}
+    virtual bool addChild(MenuitemHierarchy *parent, Menuitem *child);
     /**
  * @brief Get a menuitem the By its menuKey
  * 
  * @param menukey 
  * @return Menuitem 
  */
-    virtual Menuitem *getByKey(ushort menukey) {}
+    virtual Menuitem *getByKey(ushort menukey);
 
-    virtual Menuitem *getById(ushort menuid) {}
+    virtual Menuitem *getById(ushort menuid);
 
-    virtual ushort size() {}
+    virtual ushort size();
 
-    virtual void displayMenu(MenuitemHierarchy *parent) {}
+    virtual void displayMenu(MenuitemHierarchy *parent);
 
-    virtual void launchMenu()
-    {
-    }
+    virtual void launchMenu();
+
+    virtual void LoopCheckSerial();
 };
 } // namespace CONSOLEMENU_NAMESPACE
