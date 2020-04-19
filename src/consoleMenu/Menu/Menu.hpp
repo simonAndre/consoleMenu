@@ -132,8 +132,8 @@ public:
     }
 
 private:
-    std::array<Menuitem *, sizeMenu + 2> _menuArray{nullptr}; // sizeMenu+2 to handle 2 added special menuitems : back and exit
-    std::map<ushort, ushort> _menukeys;                       // dictionary of menykeys:menuid
+    std::array<Menuitem *, sizeMenu + 2> _menuArray; // sizeMenu+2 to handle 2 added special menuitems : back and exit
+    std::map<ushort, ushort> _menukeys;              // dictionary of menykeys:menuid
     ushort _lastmenuindex = 0;
     MenuitemHierarchy *_rootmenuitem{nullptr};
     MenuitemBack *_backmenuitem{nullptr};
@@ -347,5 +347,5 @@ private:
         } while (!done);
         _displayCallback(CONSOLEMENU_MENU_EXITED);
     }
-};
+}; // namespace CONSOLEMENU_NAMESPACE
 } // namespace CONSOLEMENU_NAMESPACE

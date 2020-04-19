@@ -2,6 +2,9 @@
 #include <iostream>
 #include "../commontypes.h"
 #include "../Configuration.h"
+#if defined(ARDUINO)
+#include "Arduino.h"
+#endif
 
 namespace CONSOLEMENU_NAMESPACE
 {
