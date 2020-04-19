@@ -1,7 +1,7 @@
 // #include "MenuitemUpdaterbase.h"
 // #include "../IO/IoHelpers.hpp"
-#include "MenuitemUpdater.hpp"
-#include "Menubase.h"
+#include "src/consoleMenu/Menu/MenuitemUpdater.hpp"
+#include "src/consoleMenu/Menu/Menubase.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {
@@ -54,7 +54,7 @@ void MenuitemUpdaterbase::display(ushort idx_menu)
 {
     IoHelpers::IOdisplay(idx_menu);
     IoHelpers::IOdisplay(_menuinstance->getOptions().id_separator);
-    IoHelpers::IOdisplay(_mname);
+    IoHelpers::IOdisplay(_mname.c_str());
     IoHelpers::IOdisplay(" [=");
     this->displayCurrentValue();
     IoHelpers::IOdisplay("]");

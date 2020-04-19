@@ -1,7 +1,7 @@
 
-#include "Menuitem.h"
-#include "Menubase.h"
-#include "../IO/IoHelpers.hpp"
+#include "src/consoleMenu/Menu/Menuitem.h"
+#include "src/consoleMenu/Menu/Menubase.h"
+#include "src/consoleMenu/IO/IoHelpers.hpp"
 
 namespace CONSOLEMENU_NAMESPACE
 {

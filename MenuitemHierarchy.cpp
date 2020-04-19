@@ -1,7 +1,7 @@
-#include "MenuitemHierarchy.h"
-#include "MenuitemCallback.h"
-#include "Menuitem.h"
-#include "Menubase.h"
+#include "src/consoleMenu/Menu/MenuitemHierarchy.h"
+#include "src/consoleMenu/Menu/MenuitemCallback.h"
+#include "src/consoleMenu/Menu/Menuitem.h"
+#include "src/consoleMenu/Menu/Menubase.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {
