@@ -29,8 +29,7 @@ bool _switchmenuValue1 = false;
 bool _switchmenuValue2 = false;
 char buff[50];
 
-// Menu consolemenu = Menu(DisplayInfos, WaitforInput);
-Menu consolemenu = Menu();
+Menubase *_consolemenu;
 
 enum MyMenuKeys
 {
@@ -47,44 +46,48 @@ void setup()
 void loop()
 {
     // CheckSerial();
-    consolemenu.LoopCheckSerial();
+    _consolemenu->LoopCheckSerial();
     delay(50);
 }
 
 void setupSerialMenu()
 {
+    _consolemenu = new Menu<20>();
     //define options
     MenuOptions menuoptions;
     menuoptions.addBack = true;
     menuoptions.addExitForEachLevel = true;
-    consolemenu.setOptions(menuoptions);
+    _consolemenu->setOptions(menuoptions);
     // menus & submenus definition
     // root menus
-    consolemenu.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);     // simple callback without parameter, see function simpleMenu
-    consolemenu.addCallbackMenuitem("action menu with param", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
-    consolemenu.addCallbackMenuitem("test prompted inputs", testIO, 0);           // callback with menu name passed as parameter, see function menuParamName
-    ushort testinputsid = consolemenu.addHierarchyMenuitem("submenu test inputs", 0);
-    ushort submenu1id = consolemenu.addHierarchyMenuitem("Sub menu 1", 0);
-    // level 2 menus, under the item [submenu1id]
-    consolemenu.addCallbackMenuitem("set string", initStringValue, submenu1id);
-    consolemenu.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1id);
-    consolemenu.addCallbackMenuitem("set int value", initIntValue, submenu1id);
-    consolemenu.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1id);
-    //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
-    consolemenu.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1id, (ushort)MyMenuKeys::switchmenu1);
-
+    MenuitemHierarchy *root = _consolemenu->getRootMenu();
+    MenuitemHierarchy *menu_testinput = root->addMenuitemHierarchy("submenu test inputs");
+    MenuitemHierarchy *menu_submenu1 = root->addMenuitemHierarchy("Sub menu 1");
     // more levels can be chained...
-    ushort submenu2id = consolemenu.addHierarchyMenuitem("sub menu 2", submenu1id);
-    consolemenu.addCallbackMenuitem("build infos", buildInfos, submenu2id); //still a simple menu
-    //another dynamic menu bind to the same callbacks with a different key
-    consolemenu.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2id, (ushort)MyMenuKeys::switchmenu2);
+    MenuitemHierarchy *menu_submenu2 = menu_submenu1->addMenuitemHierarchy("Sub menu 2");
 
-    consolemenu.addCallbackMenuitem("display value str1", displaystr1, testinputsid);
-    consolemenu.addUpdaterMenuitem("change str1", testinputsid, (char *)staticString, sizeof(staticString));
-    consolemenu.addCallbackMenuitem("display value int1", displayint1, testinputsid);
-    consolemenu.addUpdaterMenuitem("change int1", testinputsid, &int1);
-    consolemenu.addCallbackMenuitem("display value bool1", displaybool1, testinputsid);
-    consolemenu.addUpdaterMenuitem("change bool1", testinputsid, &bool1);
+    root->addMenuitemCallback("simple menu, no params", simpleMenu);     // simple callback without parameter, see function simpleMenu
+    root->addMenuitemCallback("action menu with param", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
+    root->addMenuitemCallback("test prompted inputs", testIO);           // callback with menu name passed as parameter, see function menuParamName
+
+    // level 2 menus, under the item [submenu1id]
+    menu_submenu1->addMenuitemCallback("set string", initStringValue);
+    menu_submenu1->addMenuitemCallback("display string and stay", DisplayStringValue);
+    menu_submenu1->addMenuitemCallback("set int value", initIntValue);
+    menu_submenu1->addMenuitemCallback("display int value and stop", DisplayIntValue);
+    //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
+    menu_submenu1->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu1, switchMenu);
+
+    menu_submenu2->addMenuitemCallback("build infos", buildInfos);
+    //another dynamic menu bind to the same callbacks with a different key
+    menu_submenu2->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu2, switchMenu);
+
+    menu_testinput->addMenuitemCallback("display value str1", displaystr1);
+    menu_testinput->addMenuitemUpdater("change str1", (char *)staticString, sizeof(staticString));
+    menu_testinput->addMenuitemCallback("display value int1", displayint1);
+    menu_testinput->addMenuitemUpdater("change int1", &int1);
+    menu_testinput->addMenuitemCallback("display value bool1", displaybool1);
+    menu_testinput->addMenuitemUpdater("change bool1", &bool1);
 }
 
 /********* menus callbacks ***********/
@@ -104,27 +107,27 @@ bool buildInfos()
     return false;
 }
 
-bool getVersionMenu(const char *menuname)
+bool getVersionMenu()
 {
     Serial.print("current consoleMenu version: ");
-    char *version = consolemenu.getVersion();
+    char *version = Menubase::getVersion();
     Serial.println(version);
     return false;
 }
 
-bool initIntValue(const char *menuname)
+bool initIntValue()
 {
     _intvalue = ArduinoTakeUserInput_i("enter an int value:");
     return false;
 }
 
-bool initStringValue(const char *menuname)
+bool initStringValue()
 {
     _stringvalue = ArduinoTakeUserInput_s("enter an string value:");
     return false;
 }
 
-bool DisplayStringValue(const char *menuname)
+bool DisplayStringValue()
 {
     Serial.print("string content : ");
     Serial.println(_stringvalue);
