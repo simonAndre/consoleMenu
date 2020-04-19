@@ -1,4 +1,5 @@
 #pragma once
+#include "../commontypes.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {

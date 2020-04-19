@@ -1,17 +1,26 @@
 CC=g++
-CXXFLAGS=-g  #-W -Wall
-LDFLAGS= -L./lib/
-IFLAGS= -I./src
+CXXFLAGS=-g -W -Wall -pedantic
+LIBDIR=./lib/
+LDFLAGS= -L$(LIBDIR)
+IFLAGS= -I./src -I./src/consoleMenu -I./src/consoleMenu/IO -I./src/consoleMenu/Menu
 EXEC=exemple
 TESTS=./tests/
 CATCHSB=./test/catch_sbox/
 all: exemple
 
-consoleMenu.so: ./src/*
-	$(CC) -o ./lib/consoleMenu.so ./src/*.cpp -shared  $(CXXFLAGS)
+io: ./src/consoleMenu/IO/*.hpp
+	$(CC) -o $(LIBDIR)io.so ./src/consoleMenu/IO/*.hpp -shared  $(CXXFLAGS)
+
+cmenu: ./src/*
+	$(CC) -o $(LIBDIR)consoleMenu.so ./src/consoleMenu/Menu/*.cpp  -shared  $(CXXFLAGS) $(IFLAGS)
+
+check: ./src/*
+	$(CC) -o $(LIBDIR)check.so ./src/check.cpp -shared  $(CXXFLAGS) $(IFLAGS)
+
 
 $(EXEC): ./exemples/*.cpp
-	$(CC) -o ./$(EXEC) ./exemples/*.cpp $(LDFLAGS) $(IFLAGS) $(CXXFLAGS) && ./exemple.exe
+	$(CC) ./src/consoleMenu/Menu/*.cpp ./exemples/*.cpp  -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  && ./exemple.exe
+	# $(CC) ./exemples/*.cpp -l consoleMenu.so -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  
 
 tests-prep:	$(TESTS)tests-main.cpp
 	$(CC) -o $(TESTS)tests-main.o $(TESTS)tests-main.cpp -c
@@ -33,4 +42,15 @@ catchsbox:	catchsbox-target catchsboxprep $(CATCHSB)tests-factorial.cpp
 
 
 clean: 
-	rm ./lib/consoleMenu.so  ./$(EXEC)
+	rm $(LIBDIR)consoleMenu.so 
+	rm $(LIBDIR)io.so
+	rm ./$(EXEC)
+
+
+# cmenu_nolinker: ./src/*
+# 	$(CC) -Wall -pedantic -c ./src/consoleMenu/Menu/*.cpp  $(CXXFLAGS) $(IFLAGS)
+# exemple_nolinker: ./exemples/*.cpp
+# 	$(CC) -Wall -pedantic -c ./exemples/*.cpp  $(CXXFLAGS) $(IFLAGS)
+# exemple_link:
+# 	$(CC) -Wall -pedantic ./*.o -o exemple.exe
+

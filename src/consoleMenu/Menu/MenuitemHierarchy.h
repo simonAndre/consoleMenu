@@ -1,43 +1,31 @@
 #pragma once
-// #include "Menuitem.hpp"
-// #include "specialTypes.hpp"
-// #include "../IO/IoHelpers.hpp"
-// #include "Menuitem.hpp"
-// #include "MenuitemCallback.hpp"
-// #include "MenuitemUpdater.hpp"
+
+#include "Menubase.h"
+#include "MenuitemUpdater.hpp"
+
 // #include "MenuitemHierarchy.hpp"
 // #include "Menu.hpp"
 
 namespace CONSOLEMENU_NAMESPACE
 {
 
+// forward declarations
+// class Menuitem;
+
 class MenuitemHierarchy : public Menuitem
 {
 public:
-    MenuitemHierarchy(Menubase *menuinstance, const char *label) : Menuitem()
-    {
-        this->_menuinstance = menuinstance;
-        this->_mname = std::string(label);
-        this->_mtype = menutype::hierarchymenu;
-        this->_mid = 0;
-    };
+    MenuitemHierarchy(Menubase *menuinstance, const char *label);
 
-    bool addSubItem(Menuitem *subitem)
-    {
-        return this->_menuinstance->addChild(this, subitem);
-    }
+    bool addSubItem(Menuitem *subitem);
+
     /**
  * @brief add a submenu item hierarchy
  * 
  * @param label : label displayed
  * @return new MenuitemHierarchy* created 
  */
-    MenuitemHierarchy *addMenuitemHierarchy(const char *label)
-    {
-        MenuitemHierarchy *mih = new MenuitemHierarchy(this->_menuinstance, label);
-        if (this->_menuinstance->addChild(this, mih))
-            return mih;
-    }
+    MenuitemHierarchy *addMenuitemHierarchy(const char *label);
 
     /**
      * @brief add a submenu item calling a given function - static labelling
@@ -50,12 +38,7 @@ public:
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
      */
-    bool addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc)
-    {
-        MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, label, this, menutype::externalFunction, menukey);
-        mic->SetCallback(onselectFunc);
-        return this->_menuinstance->addChild(this, mic);
-    }
+    bool addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc);
 
     /**
      * @brief add a submenu item calling a given function - dynamic labelling
@@ -68,13 +51,7 @@ public:
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
        */
-    bool addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc)
-    {
-        MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, "", this, menutype::externalFunction, menukey);
-        mic->SetCallback(onselectFunc);
-        mic->SetNamingCallback(namingFunc);
-        return this->_menuinstance->addChild(this, mic);
-    }
+    bool addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc);
 
     /**
      * @brief add a submenu item calling a given simple function (no params) - static labelling
@@ -86,12 +63,7 @@ public:
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
      */
-    bool addMenuitemCallback(const char *label, fp_callback1 onselectFunc)
-    {
-        MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, label, this, menutype::externalFunction, (ushort)CONSOLEMENU_NOMENUKEY);
-        mic->SetCallback(onselectFunc);
-        return this->_menuinstance->addChild(this, mic);
-    }
+    bool addMenuitemCallback(const char *label, fp_callback1 onselectFunc);
 
     /**
      * @brief add a submenu item calling a given simple function (no params) - dynamic labelling
@@ -103,13 +75,7 @@ public:
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
      */
-    bool addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc)
-    {
-        MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, "", this, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
-        mic->SetCallback(onselectFunc);
-        mic->SetNamingCallback(namingFunc);
-        return this->_menuinstance->addChild(this, mic);
-    }
+    bool addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc);
 
     /**
  * @brief add a menu item designed for one goal : update an string value in a given pointer to a variable.
@@ -140,18 +106,7 @@ public:
      * @return true 
      * @return false 
      */
-    bool addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize)
-    {
-
-        MenuitemUpdater<char *> *miu = new MenuitemUpdater<char *>(this->_menuinstance, label, this, menutype::variableUpdater_s);
-        miu->setVarToUpdate(variableToUpdate);
-        miu->setInputTrials(this->_menuinstance->getOptions().badInputRepeats);
-        miu->setStringToUpdateSize(stringsize);
-        return this->_menuinstance->addChild(this, miu);
-    }
-    Menuitem **getSubItems()
-    {
-    }
+    bool addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize);
 };
 
 } // namespace CONSOLEMENU_NAMESPACE

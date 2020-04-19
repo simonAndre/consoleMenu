@@ -6,8 +6,11 @@ TESTS=./tests/
 CATCHSB=./test/catch_sbox/
 all: exemple
 
+# $(EXEC): ./*.cpp
+# 	$(CC) -o ./$(EXEC) ./*.cpp $(IFLAGS) $(CXXFLAGS)
+
 $(EXEC): ./*.cpp
-	$(CC) -o ./$(EXEC) ./*.cpp $(IFLAGS) $(CXXFLAGS)
+	$(CC) ../src/consoleMenu/Menu/*.cpp ./*.cpp  -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  
 
 run: $(EXEC)
 	$(EXEC).exe

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Configuration.hpp"
+#include "Configuration.h"
 
 #if !CONSOLEMENU_DEBUG
 #ifdef __clang__
@@ -14,17 +14,6 @@
 #define STRING(x) STRING2(x)
 // #pragma message(STRING(__cplusplus))
 
-#include "Namespace.hpp"
-#include "commontypes.hpp"
-#include "Menu/specialTypes.hpp"
-#include "IO/IoHelpers.hpp"
-#include "Menu/Menubase.h"
-#include "Menu/Menu.hpp"
-#include "Menu/Menuitem.hpp"
-#include "Menu/MenuitemCallback.hpp"
-#include "Menu/MenuitemUpdater.hpp"
-#include "Menu/MenuitemHierarchy.hpp"
-#include "Menu/MenuitemBack.hpp"
 #include "Menu/Menu.hpp"
 
 #if CONSOLEMENU_EMBEDDED_MODE
@@ -40,7 +29,7 @@ using CONSOLEMENU_NAMESPACE::Menu;
 using CONSOLEMENU_NAMESPACE::Menubase;
 using CONSOLEMENU_NAMESPACE::Menuitem;
 using CONSOLEMENU_NAMESPACE::MenuitemBack;
-using CONSOLEMENU_NAMESPACE::MenuitemCallback;
+// using CONSOLEMENU_NAMESPACE::MenuitemCallback;
 using CONSOLEMENU_NAMESPACE::MenuitemHierarchy;
 using CONSOLEMENU_NAMESPACE::MenuitemUpdater;
 using CONSOLEMENU_NAMESPACE::MenuOptions;

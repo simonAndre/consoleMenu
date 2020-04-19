@@ -1,5 +1,5 @@
 
-#pragma once
+// #pragma once
 
 // #include "Menuitem.hpp"
 #include <exception>
@@ -7,11 +7,10 @@
 #include <map>
 #include <string>
 #include "Menubase.h"
+#include "MenuitemBack.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {
-// //forward declaration
-// class Menuitem;
 
 template <ushort sizeMenu>
 class Menu : public Menubase
@@ -70,7 +69,7 @@ public:
     virtual bool addChild(MenuitemHierarchy *parent, Menuitem *child) override
     {
         child->setParent(parent);
-        insertMewMenuitem(child);
+        return insertMewMenuitem(child);
     }
 
     /**
@@ -87,7 +86,7 @@ public:
      * this method can be implemnted in your code, in this case, call Menu::launchMenu() when you want to display the root menu.
      * currently only implemented for arduino
      */
-    void LoopCheckSerial()
+    virtual void LoopCheckSerial() override
     {
 #if CONSOLEMENU_EMBEDDED_MODE
         if (!this->_isserialmenuative && Serial.available() > 0)
@@ -124,7 +123,7 @@ public:
 
     virtual ushort size() override
     {
-        this->_lastmenuindex;
+        return this->_lastmenuindex;
     }
 
     virtual void displayMenu(MenuitemHierarchy *parent) override
@@ -142,7 +141,7 @@ private:
     fp_IOdisplay _displayCallback;
     fp_IOinput _inputCallback;
     fp_IOinputId _inputId;
-    char _errorbuffer[150];
+    char _errorbuffer[150]{'\0'};
 
 #if CONSOLEMENU_EMBEDDED_MODE
     bool _isserialmenuative = false;
