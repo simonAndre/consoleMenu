@@ -46,6 +46,7 @@ typedef struct
      const char *id_separator = " - ";
      bool addCurrentState = true; // if true : display the current state for each menuitem, for updater menu items only.
      ushort badInputRepeats = 1;  // nb of allowed trials for bad input before failing the input of a menu.
+     ushort expirationTimeSec = CONSOLEMENU_MENU_DEFAULTMENUSELECTIONTIMEOUT;// time after when the menu is automatically exited without any user interaction.
 } MenuOptions;
 
 enum menutype

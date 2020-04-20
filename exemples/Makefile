@@ -10,7 +10,7 @@ all: exemple
 # 	$(CC) -o ./$(EXEC) ./*.cpp $(IFLAGS) $(CXXFLAGS)
 
 $(EXEC): ./*.cpp
-	$(CC) ../src/consoleMenu/Menu/*.cpp ./*.cpp  -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  
+	$(CC) ../*.cpp ./*.cpp  -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  
 
 run: $(EXEC)
 	$(EXEC).exe

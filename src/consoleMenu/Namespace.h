@@ -4,6 +4,7 @@
 
 // #include <consoleMenu/Configuration.h>
 #include "../version.h"
+#include "Configuration.h"
 
 #define CONSOLEMENU_DO_CONCAT(A, B) A##B
 #define CONSOLEMENU_CONCAT2(A, B) CONSOLEMENU_DO_CONCAT(A, B)

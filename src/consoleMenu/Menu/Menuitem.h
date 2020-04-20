@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdexcept>
 #include "../commontypes.h"
-#include "../Configuration.h"
 #include "specialTypes.h"
 
 namespace CONSOLEMENU_NAMESPACE
