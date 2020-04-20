@@ -21,6 +21,7 @@ Menubase::Menubase(MenuOptions options)
 void Menubase::setOptions(MenuOptions options)
 {
     _menuoptions = options;
+    _menuDefaultTimeout = _menuoptions.expirationTimeSec;
 }
 
 MenuOptions Menubase::getOptions()

@@ -5,6 +5,8 @@
 namespace CONSOLEMENU_NAMESPACE
 {
 
+static ushort _menuDefaultTimeout [[gnu::unused]]{0};
+
 // forward declarations
 class Menuitem;
 class MenuitemHierarchy;

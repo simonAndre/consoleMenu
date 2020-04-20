@@ -34,6 +34,8 @@
 #define CONSOLEMENU_MENU_EXITED ">exited\n"
 #define CONSOLEMENU_MENU_CHOOSEACTION "please choose an action: >"
 #define CONSOLEMENU_MENU_OVERSIZEINPUT "oversize input, try again."
+#define CONSOLEMENU_MENU_DEFAULTMENUSELECTIONTIMEOUT 120 // in seconds : default selection timeout before exiting the menu without any user interraction
+#define CONSOLEMENU_MENU_MENUSELECTIONTIMEOUTMessage "due time expired, exiting."
 
 #define CONSOLEMENU_NOMENUKEY 9999
 #define CONSOLEMENU_RECOMPUTEPARENT 9999

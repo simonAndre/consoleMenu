@@ -1,7 +1,6 @@
 #include <string.h>
 #include <iostream>
 #include "../commontypes.h"
-#include "../Configuration.h"
 #if defined(ARDUINO)
 #include "Arduino.h"
 #endif
@@ -30,12 +29,12 @@ private:
  * @return true : good input
  * @return false : input failure, expiration of the given trials, don't use the outstr pointer.
  */
-    static bool _takeUserInputPrim(const char *promptmessage, fp_tester tester, char *outstr, size_t stringbuffersize, ushort trials)
+    static bool _takeUserInputPrim(const char *promptmessage, fp_tester tester, char *outstr, size_t stringbuffersize, ushort trials, ushort timeout_sec = 60)
     {
         ushort i = 0;
         do
         {
-            if (!TakeUserInput(promptmessage, outstr, stringbuffersize, 1))
+            if (!TakeUserInput(promptmessage, outstr, stringbuffersize, 1,timeout_sec))
             {
                 i++;
                 continue;
@@ -117,20 +116,27 @@ public:
     /**
  * @brief Wait for a user input given from the available console (use Serial for embedded devices, std::cin for computers)
  * 
- * @return const char* 
+ * @param outstring : user input 
+ * @param stringbuffersize : buffer size
+ * @param timeout_sec : expiration time (currently, only for embedded devices)
+ * @return true 
+ * @return false 
  */
-    static bool WaitforInput(char *outstring, size_t stringbuffersize)
+    static bool WaitforInput(char *outstring, size_t stringbuffersize, ushort timeout_sec)
     {
         const char *proviput;
         size_t proviputsize;
 #if CONSOLEMENU_EMBEDDED_MODE
         bool inputdone = false;
         Serial.flush();
+        uint32_t wait_ms = 0;
         do
         {
             delay(10);
+            wait_ms += 10;
             if (Serial.available() > 0)
             {
+                wait_ms = 0;
                 String as_provinput = Serial.readStringUntil('\n');
                 proviputsize = as_provinput.length();
                 // proviput = as_provinput.c_str();
@@ -146,12 +152,24 @@ public:
                     return false;
                 }
             }
-        } while (!inputdone);
+        } while (!inputdone && wait_ms < (timeout_sec * 1000));
+        if (!inputdone){
+            IOdisplayLn(CONSOLEMENU_MENU_MENUSELECTIONTIMEOUTMessage);
+            return false;
+        }
 #else
-        std::string input;
-        std::cin >> input;
-        proviputsize = input.length();
-        proviput = input.c_str();
+        // TODO : handle expiration 
+
+        // std::cout << "timeoutvalue=" << timeout_sec << "\n";
+
+        if (timeout_sec > 0)
+        {
+            std::string input;
+            std::cin >> input;
+            proviputsize = input.length();
+            proviput = input.c_str();
+        }
+
 #endif
 
         if (proviputsize < stringbuffersize)
@@ -175,12 +193,12 @@ public:
  * @return true : good input, 
  * @return false : bad input : oversize input string 
  */
-    static bool TakeUserInput(const char *promptmessage, char *outstring, size_t stringbuffersize, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, char *outstring, size_t stringbuffersize, ushort trials, ushort timeout_sec = 60)
     {
         IOdisplay(promptmessage);
         IOdisplay(">");
         ushort t = 0;
-        while (!WaitforInput(outstring, stringbuffersize) && t++ < trials)
+        while (!WaitforInput(outstring, stringbuffersize, timeout_sec) && t++ < trials)
         {
             IOdisplayLn(CONSOLEMENU_MENU_OVERSIZEINPUT);
         }
@@ -211,11 +229,11 @@ public:
  * @return true : good input
  * @return false : input failure, expiration of the given trials, don't use the outnumber pointer.
  */
-    static bool TakeUserInput(const char *promptmessage, int *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, int *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         const ushort int_nbdigitmax = 10;
         char userstring[int_nbdigitmax + 1];
-        if (_takeUserInputPrim(promptmessage, testint, userstring, int_nbdigitmax, trials))
+        if (_takeUserInputPrim(promptmessage, testint, userstring, int_nbdigitmax, trials,timeout_sec))
         {
             *outnumber = atoi(userstring);
             return true;
@@ -223,10 +241,10 @@ public:
         else
             return false;
     }
-    static bool TakeUserInput(const char *promptmessage, ushort *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, ushort *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         int i;
-        if (TakeUserInput(promptmessage, &i, trials))
+        if (TakeUserInput(promptmessage, &i, trials,timeout_sec))
         {
             if (i >= 65535)
                 return false;
@@ -234,10 +252,10 @@ public:
             return true;
         }
     }
-    static bool TakeUserInput(const char *promptmessage, unsigned char *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, unsigned char *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         int i;
-        if (TakeUserInput(promptmessage, &i, trials))
+        if (TakeUserInput(promptmessage, &i, trials,timeout_sec))
         {
             if (i >= 255)
                 return false;
@@ -255,11 +273,11 @@ public:
  * @return true 
  * @return false 
  */
-    static bool TakeUserInput(const char *promptmessage, bool *outvalue, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, bool *outvalue, ushort trials, ushort timeout_sec = 60)
     {
         const ushort siz = 2;
         char userstring[siz];
-        if (_takeUserInputPrim(promptmessage, testbool, userstring, siz, trials))
+        if (_takeUserInputPrim(promptmessage, testbool, userstring, siz, trials,timeout_sec))
         {
             if (*userstring == 'y' || *userstring == '1')
                 *outvalue = true;
@@ -283,11 +301,11 @@ public:
  * @return true : good input
  * @return false : input failure, expiration of the given trials, don't use the outnumber pointer.
  */
-    static bool TakeUserInput(const char *promptmessage, double *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, double *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         const ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];
-        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials))
+        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials, timeout_sec))
         {
             *outnumber = atof(userstring);
             return true;
@@ -295,11 +313,11 @@ public:
         else
             return false;
     }
-    static bool TakeUserInput(const char *promptmessage, float *outnumber, ushort trials)
+    static bool TakeUserInput(const char *promptmessage, float *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         const ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];
-        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials))
+        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials,timeout_sec))
         {
             *outnumber = atof(userstring);
             return true;

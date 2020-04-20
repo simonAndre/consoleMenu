@@ -28,7 +28,7 @@ public:
     {
         _displayCallback = displayCallback;
         _inputCallback = inputCallback;
-        _menuoptions = options;
+        this->setOptions(options);
         internalInit();
     }
 
@@ -46,7 +46,7 @@ public:
     Menu(fp_IOdisplay displayCallback, fp_IOinputId inputId) : Menubase()
     {
         _displayCallback = displayCallback;
-        _inputId = inputId;
+        _inputMenuEntry = inputId;
         internalInit();
     }
 
@@ -57,7 +57,7 @@ public:
     Menu() : Menubase()
     {
         _displayCallback = (fp_IOdisplay)IoHelpers::IOdisplay<const char *>;
-        _inputId = Menu::waitforInputIntDefaultCallback;
+        _inputMenuEntry = Menu::waitforInputIntDefaultCallback;
         internalInit();
     }
 
@@ -140,7 +140,7 @@ private:
     Menuitem *_exitmenuitem{nullptr};
     fp_IOdisplay _displayCallback;
     fp_IOinput _inputCallback;
-    fp_IOinputId _inputId;
+    fp_IOinputId _inputMenuEntry;
     char _errorbuffer[150]{'\0'};
 
 #if CONSOLEMENU_EMBEDDED_MODE
@@ -181,7 +181,7 @@ private:
     static ushort waitforInputIntDefaultCallback()
     {
         ushort i;
-        if (IoHelpers::TakeUserInput("", &i, 1))
+        if (IoHelpers::TakeUserInput("", &i, 1, _menuDefaultTimeout))
         {
             return i;
         }
@@ -190,6 +190,7 @@ private:
 
     bool internalInit()
     {
+
         _rootmenuitem = new MenuitemHierarchy(this, "");
         Menuitem *miroot = (Menuitem *)_rootmenuitem;
         if (!insertMewMenuitem(miroot))
@@ -283,6 +284,7 @@ private:
     void launchMenu(MenuitemHierarchy *parent, MenuitemHierarchy *backparent)
     {
         bool done = false;
+        _menuDefaultTimeout = _menuoptions.expirationTimeSec;
 
         do
         {
@@ -294,9 +296,9 @@ private:
             {
                 ushort inputi = USHRT_MAX;
                 //redisplay!! TODO
-                if (_inputId)
+                if (_inputMenuEntry)
                 {
-                    inputi = _inputId();
+                    inputi = _inputMenuEntry();
                 }
                 else if (_inputCallback)
                 {
