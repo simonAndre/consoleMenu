@@ -35,12 +35,12 @@ char *Menubase::getVersion()
     return _consolemenuversion;
 }
 
-MenuitemHierarchy *Menubase::getRootMenu()
+SubMenu *Menubase::getRootMenu()
 {
     return nullptr;
 }
 
-bool Menubase::addChild(MenuitemHierarchy *parent [[gnu::unused]], Menuitem *child [[gnu::unused]])
+bool Menubase::addChild(SubMenu *parent [[gnu::unused]], Menuitem *child [[gnu::unused]])
 {
     throw std::runtime_error("call to base function not implemented");
 }
@@ -57,7 +57,7 @@ Menuitem *Menubase::getById(ushort menuid [[gnu::unused]]) { throw std::runtime_
 
 ushort Menubase::size() { throw std::runtime_error("call to base function not implemented"); }
 
-void Menubase::displayMenu(MenuitemHierarchy *parent [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
+void Menubase::displayMenu(SubMenu *parent [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
 
 void Menubase::launchMenu()
 {

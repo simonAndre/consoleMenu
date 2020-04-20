@@ -9,7 +9,7 @@ MenuitemBack::MenuitemBack(Menubase *menuinstance) : Menuitem()
     _mname = CONSOLEMENU_MENU_BACK;
     _mtype = menutype::back;
 }
-void MenuitemBack::setLastParent(MenuitemHierarchy *lastparent)
+void MenuitemBack::setLastParent(SubMenu *lastparent)
 {
     _mparent = lastparent;
 }

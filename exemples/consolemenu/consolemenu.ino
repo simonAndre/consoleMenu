@@ -60,11 +60,11 @@ void setupSerialMenu()
     _consolemenu->setOptions(menuoptions);
     // menus & submenus definition
     // root menus
-    MenuitemHierarchy *root = _consolemenu->getRootMenu();
-    MenuitemHierarchy *menu_testinput = root->addMenuitemHierarchy("submenu test inputs");
-    MenuitemHierarchy *menu_submenu1 = root->addMenuitemHierarchy("Sub menu 1");
+    SubMenu *root = _consolemenu->getRootMenu();
+    SubMenu *menu_testinput = root->addSubMenu("submenu test inputs");
+    SubMenu *menu_submenu1 = root->addSubMenu("Sub menu 1");
     // more levels can be chained...
-    MenuitemHierarchy *menu_submenu2 = menu_submenu1->addMenuitemHierarchy("Sub menu 2");
+    SubMenu *menu_submenu2 = menu_submenu1->addSubMenu("Sub menu 2");
 
     root->addMenuitemCallback("simple menu, no params", simpleMenu);     // simple callback without parameter, see function simpleMenu
     root->addMenuitemCallback("action menu with param", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName

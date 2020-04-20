@@ -17,7 +17,7 @@ cmenu: $(SRCDIR)*
 
 
 $(EXEC): ./exemples/*.cpp
-	$(CC) $(SRCDIR)*.cpp ./exemples/*.cpp  -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  && ./exemple.exe
+	$(CC) $(SRCDIR)*.cpp ./exemples/*.cpp  -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)
 	# $(CC) ./exemples/*.cpp -l consoleMenu.so -o ./$(EXEC) $(LDFLAGS) $(IFLAGS) $(CXXFLAGS)  
 
 tests-prep:	$(TESTS)tests-main.cpp

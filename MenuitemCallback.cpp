@@ -6,7 +6,7 @@
 namespace CONSOLEMENU_NAMESPACE
 {
 
-MenuitemCallback::MenuitemCallback(Menubase *menuinstance, const char *menuname, MenuitemHierarchy *parent, menutype type, ushort menukey)
+MenuitemCallback::MenuitemCallback(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type, ushort menukey)
     : Menuitem(menuinstance, menuname, parent, type)
 {
     this->_mkey = menukey;

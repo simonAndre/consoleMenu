@@ -10,7 +10,7 @@ namespace CONSOLEMENU_NAMESPACE
 
 //forward declaration
 class Menubase;
-class MenuitemHierarchy;
+class SubMenu;
 
 class Menuitem
 {
@@ -18,7 +18,7 @@ private:
 protected:
     Menubase *_menuinstance{nullptr};
     ushort _mid = 0;
-    MenuitemHierarchy *_mparent{nullptr}; // if defined, it must be a MenuitemHierarchy
+    SubMenu *_mparent{nullptr};           // if defined, it must be a SubMenu
     ushort _mkey = CONSOLEMENU_NOMENUKEY; //optional
     std::string _mname;
     menutype _mtype;
@@ -35,12 +35,12 @@ public:
  * @param menuFonction 
  * @param type 
  */
-    Menuitem(Menubase *menuinstance, const char *menuname, MenuitemHierarchy *parent, menutype type);
+    Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type);
 
     void setMenuInstance(Menubase *mi);
 
-    MenuitemHierarchy *getParent();
-    void setParent(MenuitemHierarchy *parent);
+    SubMenu *getParent();
+    void setParent(SubMenu *parent);
     void setName(const char *name);
     const char *getName();
     void setType(menutype type);

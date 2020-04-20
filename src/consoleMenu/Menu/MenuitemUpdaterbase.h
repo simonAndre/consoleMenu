@@ -10,7 +10,7 @@ protected:
     ushort _inputtrials;
 
 public:
-    MenuitemUpdaterbase(Menubase *menuinstance, const char *menuname, MenuitemHierarchy *parent, menutype type);
+    MenuitemUpdaterbase(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type);
     MenuitemUpdaterbase();
 
     /**

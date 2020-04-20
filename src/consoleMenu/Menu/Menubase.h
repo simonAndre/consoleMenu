@@ -9,7 +9,7 @@ static ushort _menuDefaultTimeout [[gnu::unused]]{0};
 
 // forward declarations
 class Menuitem;
-class MenuitemHierarchy;
+class SubMenu;
 
 class Menubase
 {
@@ -24,9 +24,9 @@ public:
 
     static char *getVersion();
 
-    virtual MenuitemHierarchy *getRootMenu();
+    virtual SubMenu *getRootMenu();
 
-    virtual bool addChild(MenuitemHierarchy *parent, Menuitem *child);
+    virtual bool addChild(SubMenu *parent, Menuitem *child);
     /**
  * @brief Get a menuitem the By its menuKey
  * 
@@ -39,7 +39,7 @@ public:
 
     virtual ushort size();
 
-    virtual void displayMenu(MenuitemHierarchy *parent);
+    virtual void displayMenu(SubMenu *parent);
 
     virtual void launchMenu();
 

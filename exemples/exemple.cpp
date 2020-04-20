@@ -51,38 +51,38 @@ enum MyMenuKeys
 
 void SetupMenu()
 {
-    mymenu = new Menu<19>();
-    // declaration,
+    mymenu = new Menu<19>(); //declare a menu sized for 19 menu-items
+
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
-    // menus & submenus definition
-    // root menus
     MenuOptions mo;
     mo.addBack = true;
     mo.addExitForEachLevel = true;
     mo.expirationTimeSec = 10;
     mymenu->setOptions(mo);
 
-    MenuitemHierarchy* root = mymenu->getRootMenu();
-    MenuitemHierarchy *submenu1 = root->addMenuitemHierarchy("Submenu inputs w callbacks");
-    MenuitemHierarchy *submenu2 = root->addMenuitemHierarchy("submenu inputs w updaters");
-    root->addMenuitemCallback("simple menu and exit", simpleMenu);  // simple callback without parameter, see function simpleMenu
+    // menus & submenus definition
+    // root menus
+    SubMenu *root = mymenu->getRootMenu();        //get the root menu-item
+    SubMenu *submenu1 = root->addSubMenu("Submenu inputs w callbacks");
+    SubMenu *submenu2 = root->addSubMenu("submenu inputs w updaters");
+    root->addMenuitemCallback("simple menu and exit", simpleMenu);    // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
     root->addMenuitemCallback("consoleMenu version", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
 
     root->addMenuitemCallback("test prompted inputs", testIO); // callback with menu name passed as parameter, see function menuParamName
-    // // level 2 menus, under the item [submenu1]
+    // level 2 menus, under the item [submenu1]
     submenu1->addMenuitemCallback("set string", initStringValue);
     submenu1->addMenuitemCallback("display string and stay", DisplayStringValue);
     submenu1->addMenuitemCallback("set timeout", SetTimeout);
     submenu1->addMenuitemCallback("set int value", initIntValue);
     submenu1->addMenuitemCallback("display int value and stop", DisplayIntValue);
-    // //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
+    // this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
     submenu1->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu1, switchMenu);
 
-    // // more levels can be chained...
-    MenuitemHierarchy *submenu3 = submenu1->addMenuitemHierarchy("sub menu 2");
+    // more levels can be chained...
+    SubMenu *submenu3 = submenu1->addSubMenu("sub menu 2");
     submenu3->addMenuitemCallback("build infos", buildInfos); //still a simple menu
-    // //another dynamic menu bind to the same callbacks with a different key
+    // another dynamic menu bind to the same callbacks with a different key
     submenu3->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu2, switchMenu);
 
     submenu2->addMenuitemCallback("display value str1", displaystr1);

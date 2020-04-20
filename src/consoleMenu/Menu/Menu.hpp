@@ -61,12 +61,12 @@ public:
         internalInit();
     }
 
-    virtual MenuitemHierarchy *getRootMenu() override
+    virtual SubMenu *getRootMenu() override
     {
         return _rootmenuitem;
     }
 
-    virtual bool addChild(MenuitemHierarchy *parent, Menuitem *child) override
+    virtual bool addChild(SubMenu *parent, Menuitem *child) override
     {
         child->setParent(parent);
         return insertMewMenuitem(child);
@@ -126,7 +126,7 @@ public:
         return this->_lastmenuindex;
     }
 
-    virtual void displayMenu(MenuitemHierarchy *parent) override
+    virtual void displayMenu(SubMenu *parent) override
     {
         displayMenu(parent, nullptr);
     }
@@ -135,7 +135,7 @@ private:
     std::array<Menuitem *, sizeMenu + 2> _menuArray; // sizeMenu+2 to handle 2 added special menuitems : back and exit
     std::map<ushort, ushort> _menukeys;              // dictionary of menykeys:menuid
     ushort _lastmenuindex = 0;
-    MenuitemHierarchy *_rootmenuitem{nullptr};
+    SubMenu *_rootmenuitem{nullptr};
     MenuitemBack *_backmenuitem{nullptr};
     Menuitem *_exitmenuitem{nullptr};
     fp_IOdisplay _displayCallback;
@@ -191,7 +191,7 @@ private:
     bool internalInit()
     {
 
-        _rootmenuitem = new MenuitemHierarchy(this, "");
+        _rootmenuitem = new SubMenu(this, "");
         Menuitem *miroot = (Menuitem *)_rootmenuitem;
         if (!insertMewMenuitem(miroot))
         {
@@ -226,7 +226,7 @@ private:
  * @param backparent : point to the hierarchy menu-item fo the displayed back menu-item (if one on this submenu)
  * @return std::map<ushort, ushort> 
  */
-    std::map<ushort, ushort> displayMenu(MenuitemHierarchy *parent, MenuitemHierarchy *backparent)
+    std::map<ushort, ushort> displayMenu(SubMenu *parent, SubMenu *backparent)
     {
 
         if (!_exitmenuitem)
@@ -281,7 +281,7 @@ private:
  * @param parent 
  * @param backparent 
  */
-    void launchMenu(MenuitemHierarchy *parent, MenuitemHierarchy *backparent)
+    void launchMenu(SubMenu *parent, SubMenu *backparent)
     {
         bool done = false;
         _menuDefaultTimeout = _menuoptions.expirationTimeSec;
@@ -318,7 +318,7 @@ private:
                 if (menuitems.find(inputi) != menuitems.end())
                 {
                     Menuitem *mi = _menuArray[menuitems.at(inputi)];
-                    MenuitemHierarchy *mih = (MenuitemHierarchy *)mi;
+                    SubMenu *mih = (SubMenu *)mi;
                     switch (mi->getType())
                     {
                     case menutype::hierarchymenu:
