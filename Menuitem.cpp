@@ -17,7 +17,7 @@ Menuitem::Menuitem() {}
  * @param menuFonction 
  * @param type 
  */
-Menuitem::Menuitem(Menubase *menuinstance, const char *menuname, MenuitemHierarchy *parent, menutype type)
+Menuitem::Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type)
 {
     this->_menuinstance = menuinstance;
     this->_mparent = parent;
@@ -30,11 +30,11 @@ void Menuitem::setMenuInstance(Menubase *mi)
     this->_menuinstance = mi;
 }
 
-MenuitemHierarchy *Menuitem::getParent()
+SubMenu *Menuitem::getParent()
 {
-    return (MenuitemHierarchy *)this->_mparent;
+    return (SubMenu *)this->_mparent;
 }
-void Menuitem::setParent(MenuitemHierarchy *parent)
+void Menuitem::setParent(SubMenu *parent)
 {
     this->_mparent = parent;
 }

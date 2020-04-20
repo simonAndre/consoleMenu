@@ -1,21 +1,20 @@
 # consoleMenu, a simple console UI hierarchy menu
 
-** to updte to the 0.4.1 version breaking changes **
-
 
 (c) Simon ANDRE, 2019
 
 target : any environment : embedded, linux or windows.
 mainly done for embedded, its main purpose is to be simple and very lightweight with a small memory footprint.
 
-work on a callback basis : each call to a memnu item is linked to a simple callback function.
+work on a callback basis : each call to a menu item is linked to a simple callback function. 
+Or even simpler, a pointer to the variable to update can just be hooked to a menu item.
 
 ## tagets
 
 + linux computers
 + tested embedded microcontroler :
   + esp32 series (espressif)
-  + for AVR series, use the STL lib (not tested yet)
+  + for AVR series, use the STL lib (to be tested )
 
 ## build, test
 
@@ -37,82 +36,83 @@ work on a callback basis : each call to a memnu item is linked to a simple callb
 ## exemple of rendering : 
 
 ```
----------------------
-1 - simple menu, no params
-2 - switch OFF feature1
-3 - test prompted inputs
-4 - submenu test inputs 2
-5 - Sub menu 1
-6 - > exit
+---- submenu inputs w callbacks ----
+1 - < back
+2 - display value str1
+3 - change str1 [=first string]
+4 - change int1 [=1234]
+5 - change float1 [=5688.56]
+6 - change bool1 [=ON]
+7 - > exit
 please choose an action: >
 ```
 
 ## usage
 
-example of the definition of a 3 level hierarchical menu:
+### Menu initialisation 
+
+you need to provide the size of the menu collection as a template parameter. : 
+> Menubase *mymenu =new Menu<**menu-size**>(); 
+
+
 ### setup : 
 
 #### the easy way 
 ```C++
 #include <consoleMenu.h>
-Menu consolemenu = Menu();
+Menubase *mymenu =new Menu<5>();   //declare a menu sized for 5 menu-items
 // menus & submenus definition
-// root menus
-m.addCallbackMenuitem("action 1", menu1, 0);
-m.addCallbackMenuitem("action 2", menu2, 0);
+SubMenu *root = mymenu->getRootMenu();        //get the root menu-item
+SubMenu *submenu1 = root->addSubMenu("Submenu 1");  // declare and get the menu-item for the submenu1
+ 
+// add a callback menu-item to the root menu:
+root->addMenuitemCallback("simple menu and exit", simpleMenu);    // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
 // ... (see below for more examples)
 ```
 
 #### the complete way
+example of the definition of a 3 level hierarchical menu:
 
 ```C++
 // include the library
 #include <consoleMenu.h>
+Menubase *mymenu =new Menu<15>();   //declare a menu sized for 15 menu-items
 
-//optional : define options
+//optional : define some options
 MenuOptions menuoptions;
 menuoptions.addBack = true;
 menuoptions.addExitForEachLevel = true;
-
-// declaration,
-// DisplayInfos: IO callback to render the menu : optional, a default callback is provided within the library
-// WaitforInput: IO callback to wait and read the user input : optional, a default callback is provided within the library
-// menuoptions : opional : can also be called after the initialization with the Menu::setOptions method
-Menu m(DisplayInfos, WaitforInput, menuoptions);
+mymenu->setOptions(mo);
 
 // menus & submenus definition
 // root menus
-    m.addCallbackMenuitem("simple menu, no params", simpleMenu, 0);  // simple callback without parameter, see function simpleMenu
-    m.addCallbackMenuitem("consoleMenu version", getVersionMenu, 0); // callback with menu name passed as parameter, see function menuParamName
-    m.addCallbackMenuitem("test prompted inputs", testIO, 0);        // callback with menu name passed as parameter, see function menuParamName
-    Menuitem testinputs = m.addHierarchyMenuitem("submenu test inputs", 0);
-    Menuitem submenu1 = m.addHierarchyMenuitem("Sub menu 1", 0, 66);
-    // level 2 menus, under the item [submenu1]
-    m.addCallbackMenuitem("set string", initStringValue, submenu1.mid);
-    m.addCallbackMenuitem("display string and stay", DisplayStringValue, submenu1.mid);
-    m.addCallbackMenuitem("set int value", initIntValue, submenu1.mid);
-    m.addCallbackMenuitem("display int value and stop", DisplayIntValue, submenu1.mid);
-    //this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
-    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu1.mid, (ushort)MyMenuKeys::switchmenu1);
+SubMenu *root = mymenu->getRootMenu();        //get the root menu-item
+SubMenu *submenu1 = root->addSubMenu("Submenu inputs w callbacks");
+SubMenu *submenu2 = root->addSubMenu("submenu inputs w updaters");
+root->addMenuitemCallback("simple menu and exit", simpleMenu);    // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
+root->addMenuitemCallback("consoleMenu version", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
 
-    // more levels can be chained...
-    Menuitem submenu2 = m.addHierarchyMenuitem("sub menu 2", submenu1.mid);
-    m.addCallbackMenuitem("build infos", buildInfos, submenu2.mid); //still a simple menu
-    //another dynamic menu bind to the same callbacks with a different key
-    m.addDynamicCallbackMenuitem(switchMenuDisplay, switchMenu, submenu2.mid, (ushort)MyMenuKeys::switchmenu2);
+root->addMenuitemCallback("test prompted inputs", testIO); // callback with menu name passed as parameter, see function menuParamName
+// level 2 menus, under the item [submenu1]
+submenu1->addMenuitemCallback("set string", initStringValue);
+submenu1->addMenuitemCallback("set int value", initIntValue);
+// this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
+submenu1->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu1, switchMenu);
 
-    m.addCallbackMenuitem("display value str1", displaystr1, testinputs.mid);
-    m.addUpdaterMenuitem("change str1", testinputs.mid, (char *)staticString, sizeof(staticString));
-    m.addCallbackMenuitem("display value int1", displayint1, testinputs.mid);
-    m.addUpdaterMenuitem("change int1", testinputs.mid, &int1);
-    m.addCallbackMenuitem("display value bool1", displaybool1, testinputs.mid);
-    m.addUpdaterMenuitem("change bool1", testinputs.mid, &bool1);
+// more levels can be chained...
+SubMenu *submenu3 = submenu1->addSubMenu("sub menu 2");
+submenu3->addMenuitemCallback("build infos", buildInfos); //still a simple menu
+// another dynamic menu bind to the same callbacks with a different key
+submenu3->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu2, switchMenu);
 
-    Menuitem mi = m.getByKey(66);
-    m.addCallbackMenuitem("late created menu", simpleMenu, mi.mid);
+// menuitemUpdater automatically update a variable (given by its pointer) from the user input value.
+submenu2->addMenuitemUpdater("change str1", (char *)staticString, sizeof(staticString));    // example with a string
+submenu2->addMenuitemUpdater("change int1", &int1);     // example with an int
+submenu2->addMenuitemUpdater("change float1", &float1);     // example with a float
+submenu2->addMenuitemUpdater("change bool1", &bool1);      // example with a bool (rendered as ON/OFF or Y/N..)
 
-//and display the root menu
-m.launchMenu();
+// and display the root menu (can be call later, in the main loop for example)
+mymenu->launchMenu();
 ```
 
 ### call the menu to render
@@ -124,7 +124,7 @@ simply use Menu::launchMenu() this call will exit when the user make his choice 
 suitable on a computer or in a specific embedded method):
 
 ```C++
-m.launchMenu();
+mymenu->launchMenu();
 ```
 
 #### method 2
@@ -132,7 +132,7 @@ m.launchMenu();
 in a process loop (for exemple : the loop() arduino method):
 
 ```C++
-consolemenu.LoopCheckSerial();
+mymenu->LoopCheckSerial();
 ```
 
 
@@ -154,14 +154,6 @@ bool menucallback();
 
 #### form 2
 
-the parameter menuname is the display of the selected menuitem (as seen by the end-user).
-
-```C++
-bool menucallback(const char *menuname);
-```
-
-#### form 3
-
 + the parameter menukey is the user-key of the selected menuitem (set in the Menu::addCallbackMenuitem method)
 + the parameter menuname is the label of the selected menuitem (as seen by the end-user).
 
@@ -169,98 +161,154 @@ bool menucallback(const char *menuname);
 bool menucallback(ushort menukey, const char *menuname);
 ```
 
+### Menu-items
+
+A menu is made of several menu-items of one of the following types : 
++ SubMenu : 
+  + This type of menu-item is handling the hierarchy of the menu. 
+  + From the SubMenu items, it's possible to nest every type of menu-item.
+  + The root menu-item is of SubMenu type.
++ MenuitemCallback : 
+  + call a function performing a specific action
+  + see the [callback](#callbacks) section to consult the supported forms (or prototypes) of the callback functions you can declare.
+  + the SetNamingCallback method can be used to label dynamically the menu-item. Otherwise, a static label must be provided on the declaration of the menu-item. 
++ MenuitemUpdater : 
+  + Provides a straight-forward method to prompt the user for an update on the content of a variable, without any callback.
+  + A pointer to the target variable is given as parameter to this method
+
+some special menu-items like exit and back entries are added automatically by the library (given your options) and doesn't need to be counted for the collection size to declare with the [menu type template](#Menu-initialisation). 
+
 ### Menu items declaration methods
 
-#### hierarchy menu-item
+The menu-items are declared from the parent SubMenu they will be nested under. The first SubMenu is the root, it is retrieved by this way : 
+> SubMenu *root = mymenu->getRootMenu();
+
+
+#### SubMenu menu-item
 
 add an item heading to a submenu
 
 ```c++
-ushort addHierarchyMenuitem(const char *menuname, ushort parentid);
+/**
+* @brief add a submenu item hierarchy
+* 
+* @param label : label displayed
+* @return new SubMenu* created 
+*/
+ SubMenu *addSubMenu(const char *label);
+
+
+// example : 
+SubMenu *newsubmenu = parentitem->addSubMenu("new submenu");
 ```
-
-with :
-
-+ menuname : label of the menuitem (as seen by the end-user)
-+ parentid : if this menuitem is under a submenu : id of the parent item
-+ --> return value : id of the new menu-item created. To be used on the next submenu items as a reference to this item.
 
 #### callback menu-item
 
 add a menu item calling a given function.
 
-```c++
-ushort addCallbackMenuitem(const char *menuname, fp_callback menuFonction, ushort parentid);
-```
 
-with :
-
-+ menuname : label of the menuitem (as seen by the end-user)
-+ menuFonction : pointer to the function to call for this menu. this function can be on the form 1 or 2 described in the upper *callbacks section*. 
-+ parentid : if this menuitem is under a submenu : id of the parent item
-+ --> return value : id of the new menu-item created.
-
-#### callback menu-item with user-key
-
-add a menu item calling a given function, same as preceeding option with an additionnal user-key allowing the grouping of several menu-items on the same callback.
+Overloads of addMenuitemCallback : 
 
 ```c++
-ushort addCallbackMenuitem(const char *menuname, fp_callback3 menuFonction, ushort parentid, ushort menukey);
+  /**
+   * @brief add a submenu item calling a given function - static labelling
+   * 
+   * @param label : label displayed
+   * @param menukey : key to use for this menu (the unicity of this key is under your concern, this menu-item con't be created if it's not unique).
+   * @param onselectFunc : pointer to the function to call for this menu. on the form @fp_callback3.
+   * If the return value of the function is true : exit the menu after execution of this function, 
+   * else stay in the current menu and wait for another action
+   * @return true : new menu-item correctly added to the collection.
+   * @return false : an issue occured (typically, check the unicity of menukey)
+   */
+  bool addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc);
+
+  /**
+   * @brief add a submenu item calling a given function - dynamic labelling
+   * 
+   * @param namingFunc : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
+   * @param menukey : key to use for this menu (the unicity of this key is under your concern, this menu-item con't be created if it's not unique).
+   * @param onselectFunc : pointer to the function to call for this menu. on the form @fp_callback3.
+   * If the return value of the function is true : exit the menu after execution of this function, 
+   * else stay in the current menu and wait for another action
+   * @return true : new menu-item correctly added to the collection.
+   * @return false : an issue occured (typically, check the unicity of menukey)
+     */
+  bool addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc);
+
+  /**
+   * @brief add a submenu item calling a given simple function (no params) - static labelling
+   * 
+   * @param label : label displayed
+   * @param onselectFunc : pointer to the function to call for this menu. on the form @fp_callback1 (no params).
+   * If the return value of the function is true : exit the menu after execution of this function, 
+   * else stay in the current menu and wait for another action
+   * @return true : new menu-item correctly added to the collection.
+   * @return false : an issue occured (typically, check the unicity of menukey)
+   */
+  bool addMenuitemCallback(const char *label, fp_callback1 onselectFunc);
+
+  /**
+   * @brief add a submenu item calling a given simple function (no params) - dynamic labelling
+   * 
+   * @param namingFunc : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
+   * @param onselectFunc : pointer to the function to call for this menu. on the form @fp_callback1 (no params).
+   * If the return value of the function is true : exit the menu after execution of this function, 
+   * else stay in the current menu and wait for another action
+   * @return true : new menu-item correctly added to the collection.
+   * @return false : an issue occured (typically, check the unicity of menukey)
+   */
+  bool addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc);
 ```
-
-with :
-
-+ menuname : label of the menuitem (as seen by the end-user)
-+ menuFonction : pointer to the function to call for this menu. this function must be on the form 3 described in the upper *callbacks section*. 
-+ parentid : if this menuitem is under a submenu : id of the parent item
-+ menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique). This key is passed back to the callback
-+ --> return value : id of the new menu-item created.
-
-#### callback menu-item with dynamic label
-
-Add to the preceeding option a callback to define from your code the menu label given the updated context. The use of a user-key (menukey) is necessary for this feature.
-
-```c++
-ushort addDynamicCallbackMenuitem(fp_namingcallback menunamefunction, fp_callback3 menuFonction, ushort parentid, ushort menukey);
-```
-
-with :
-
-+ menunamefunction : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
-+ menuFonction : pointer to the function to call for this menu. this function must be on the form 3 described in the upper *callbacks section*.
-+ parentid : if this menuitem is under a submenu : id of the parent item
-+ menukey : key to use for this menu (the unicity of this key is under your concern, an exception will be thrown if it's not unique). This key is passed back to the callback
-+ --> return value : id of the new menu-item created.
 
 #### Updater menu-item 
 
 Provides a straight-forward method to prompt the user for an update on the content of a variable, without any callback.
 A pointer to the target variable is given as parameter to this method.
-The target variable can be of the following types: 
+The target variable can be of any of simple valued type like : 
 + c-string (char*)
 + int
 + ushort (unsigned short)
 + double/float
-+ bool (true value can be input as y or 1 and false : n or 0)
++ bool (true value can be input as y or 1 and false : n or 0)...
+
+c-string types are handled specifically as we must provide the size of the string buffer as a parameter.
+
+prototypes :
 
 ```c++
-// for a string:
-ushort addUpdaterMenuitem(const char *menuname, ushort parentid, char *variableToUpdate, size_t stringsize, ushort trials)
 
-// for other supported types : 
-ushort addUpdaterMenuitem(const char *menuname, ushort parentid, <TYPE> *variableToUpdate, ushort trials)
+ /**
+ * @brief add a menu item designed for one goal : update a value in a given pointer to a variable.
+     * 
+ * 
+ * @tparam T 
+ * @param label 
+ * @param variableToUpdate : pointer to the variable to be updated 
+ * @param stringsize : size max of the c-string (buffer of char) 
+ * @return true 
+ * @return false 
+ */
+  template <typename T>
+  bool addMenuitemUpdater(const char *label, T *variableToUpdate)
+  {
+      MenuitemUpdater<T> *miu = new MenuitemUpdater<T>(this->_menuinstance, label, this, menutype::variableUpdater_i);
+      miu->setVarToUpdate(variableToUpdate);
+      miu->setInputTrials(this->_menuinstance->getOptions().badInputRepeats);
+      return this->_menuinstance->addChild(this, miu);
+  }
+
+  /**
+   * @brief add a menu item designed for one goal : update a string value in a given pointer to a variable.
+   * 
+   * @param label 
+   * @param variableToUpdate : pointer to the variable to be updated
+   * @param stringsize : size max of the c-string (buffer of char)
+   * @return true 
+   * @return false 
+   */
+  bool addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize);
 ```
-
-with : 
-
-+ menuname : label of the menuitem (as seen by the end-user)
-+ parentid : if this menuitem is under a submenu : id of the parent item
-+ variableToUpdate : pointer to the variable to be updated
-+ stringsize (for string only) : size max of the c-string (buffer of char)
-+ trials : number of given trials before issuing a failure and exits the assignement loop.
-+ --> return value : id of the new menu-item created.
-
-
 
 
 

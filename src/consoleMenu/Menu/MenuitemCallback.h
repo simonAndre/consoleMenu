@@ -1,11 +1,6 @@
 #pragma once
 #include "Menuitem.h"
 #include "specialTypes.h"
-// #include "Menuitem.hpp"
-// #include "MenuitemCallback.hpp"
-// #include "MenuitemUpdater.hpp"
-// #include "MenuitemHierarchy.hpp"
-// #include "Menu.hpp"
 namespace CONSOLEMENU_NAMESPACE
 {
 
@@ -27,7 +22,7 @@ public:
  * @param menuFonction 
  * @param type 
  */
-    MenuitemCallback(Menubase *menuinstance, const char *menuname, MenuitemHierarchy *parent, menutype type, ushort menukey);
+    MenuitemCallback(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type, ushort menukey);
 
     MenuitemCallback();
 

@@ -30,7 +30,7 @@ using CONSOLEMENU_NAMESPACE::Menubase;
 using CONSOLEMENU_NAMESPACE::Menuitem;
 using CONSOLEMENU_NAMESPACE::MenuitemBack;
 // using CONSOLEMENU_NAMESPACE::MenuitemCallback;
-using CONSOLEMENU_NAMESPACE::MenuitemHierarchy;
+using CONSOLEMENU_NAMESPACE::SubMenu;
 using CONSOLEMENU_NAMESPACE::MenuitemUpdater;
 using CONSOLEMENU_NAMESPACE::MenuOptions;
 using CONSOLEMENU_NAMESPACE::menutype;
