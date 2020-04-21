@@ -181,9 +181,16 @@ private:
     static ushort waitforInputIntDefaultCallback()
     {
         ushort i;
-        if (IoHelpers::TakeUserInput("", &i, 1, _menuDefaultTimeout))
+        try
         {
-            return i;
+            if (IoHelpers::TakeUserInput("", &i, 1, _menuDefaultTimeout))
+            {
+                return i;
+            }
+        }
+        catch (std::runtime_error &e)
+        {
+            IoHelpers::IOdisplayLn(e.what());
         }
         return 0;
     }
@@ -311,11 +318,13 @@ private:
                 }
 #if CONSOLEMENU_EMBEDDED_MODE
                 // on a computer with screen, the input is already displayed
-                char strbuff[3];
-                sprintf(strbuff, "%i", inputi);
+                char strbuff[4];
+                sprintf(strbuff, "%i\n", inputi);
                 _displayCallback(strbuff);
 #endif
-                if (menuitems.find(inputi) != menuitems.end())
+                if (inputi == 0)
+                    done = true;
+                else if (menuitems.find(inputi) != menuitems.end())
                 {
                     Menuitem *mi = _menuArray[menuitems.at(inputi)];
                     SubMenu *mih = (SubMenu *)mi;

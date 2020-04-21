@@ -34,7 +34,7 @@ private:
         ushort i = 0;
         do
         {
-            if (!TakeUserInput(promptmessage, outstr, stringbuffersize, 1,timeout_sec))
+            if (!TakeUserInput(promptmessage, outstr, stringbuffersize, 1, timeout_sec))
             {
                 i++;
                 continue;
@@ -51,7 +51,9 @@ private:
                     break;
                 }
                 if (p == siz - 1)
+                {
                     return true;
+                }
                 p++;
             } while (p < siz);
         } while (i < trials);
@@ -153,12 +155,10 @@ public:
                 }
             }
         } while (!inputdone && wait_ms < (timeout_sec * 1000));
-        if (!inputdone){
-            IOdisplayLn(CONSOLEMENU_MENU_MENUSELECTIONTIMEOUTMessage);
-            return false;
-        }
+        if (!inputdone)
+            throw std::runtime_error(CONSOLEMENU_MENU_MENUSELECTIONTIMEOUTMessage);
 #else
-        // TODO : handle expiration 
+        // TODO : handle expiration
 
         // std::cout << "timeoutvalue=" << timeout_sec << "\n";
 
@@ -198,12 +198,14 @@ public:
         IOdisplay(promptmessage);
         IOdisplay(">");
         ushort t = 0;
+
         while (!WaitforInput(outstring, stringbuffersize, timeout_sec) && t++ < trials)
         {
             IOdisplayLn(CONSOLEMENU_MENU_OVERSIZEINPUT);
         }
         if (t < trials)
             return true;
+
         return false;
     }
 
@@ -233,7 +235,7 @@ public:
     {
         const ushort int_nbdigitmax = 10;
         char userstring[int_nbdigitmax + 1];
-        if (_takeUserInputPrim(promptmessage, testint, userstring, int_nbdigitmax, trials,timeout_sec))
+        if (_takeUserInputPrim(promptmessage, testint, userstring, int_nbdigitmax, trials, timeout_sec))
         {
             *outnumber = atoi(userstring);
             return true;
@@ -244,7 +246,7 @@ public:
     static bool TakeUserInput(const char *promptmessage, ushort *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         int i;
-        if (TakeUserInput(promptmessage, &i, trials,timeout_sec))
+        if (TakeUserInput(promptmessage, &i, trials, timeout_sec))
         {
             if (i >= 65535)
                 return false;
@@ -255,7 +257,7 @@ public:
     static bool TakeUserInput(const char *promptmessage, unsigned char *outnumber, ushort trials, ushort timeout_sec = 60)
     {
         int i;
-        if (TakeUserInput(promptmessage, &i, trials,timeout_sec))
+        if (TakeUserInput(promptmessage, &i, trials, timeout_sec))
         {
             if (i >= 255)
                 return false;
@@ -277,7 +279,7 @@ public:
     {
         const ushort siz = 2;
         char userstring[siz];
-        if (_takeUserInputPrim(promptmessage, testbool, userstring, siz, trials,timeout_sec))
+        if (_takeUserInputPrim(promptmessage, testbool, userstring, siz, trials, timeout_sec))
         {
             if (*userstring == 'y' || *userstring == '1')
                 *outvalue = true;
@@ -317,7 +319,7 @@ public:
     {
         const ushort double_nbdigitmax = 15;
         char userstring[double_nbdigitmax];
-        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials,timeout_sec))
+        if (_takeUserInputPrim(promptmessage, testdecimal, userstring, double_nbdigitmax, trials, timeout_sec))
         {
             *outnumber = atof(userstring);
             return true;
