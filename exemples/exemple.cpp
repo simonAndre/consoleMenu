@@ -13,6 +13,8 @@ bool simpleMenu();
 bool buildInfos();
 bool getVersionMenu();
 bool switchMenu(ushort menukey, const char *menuname);
+bool addedlog(ushort menukey, const char *menuname);
+bool addedlog2();
 const char *switchMenuDisplay(ushort menukey);
 bool testIO();
 bool displaystr1();
@@ -46,7 +48,8 @@ ushort WaitforInput()
 enum MyMenuKeys
 {
     switchmenu1,
-    switchmenu2
+    switchmenu2,
+    int1updater
 };
 
 void SetupMenu()
@@ -63,11 +66,16 @@ void SetupMenu()
 
     // menus & submenus definition
     // root menus
-    SubMenu *root = mymenu->getRootMenu();        //get the root menu-item
+    SubMenu *root = mymenu->getRootMenu(); //get the root menu-item
     SubMenu *submenu1 = root->addSubMenu("Submenu inputs w callbacks");
     SubMenu *submenu2 = root->addSubMenu("submenu inputs w updaters");
-    root->addMenuitemCallback("simple menu and exit", simpleMenu);    // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
-    root->addMenuitemCallback("consoleMenu version", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
+    root->addMenuitemCallback("simple menu and exit", simpleMenu);                          // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
+    auto mic_getversion = root->addMenuitemCallback("consoleMenu version", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
+    if (mic_getversion)
+    {
+        mic_getversion->addCallback(addedlog);
+        mic_getversion->addCallback(addedlog2);
+    }
 
     root->addMenuitemCallback("test prompted inputs", testIO); // callback with menu name passed as parameter, see function menuParamName
     // level 2 menus, under the item [submenu1]
@@ -87,9 +95,20 @@ void SetupMenu()
 
     submenu2->addMenuitemCallback("display value str1", displaystr1);
     submenu2->addMenuitemUpdater("change str1", (char *)staticString, sizeof(staticString));
-    submenu2->addMenuitemUpdater("change int1", &int1);
+    auto miu_changint = submenu2->addMenuitemUpdater("change int1, enter 3 will break the 1st callback", &int1);
     submenu2->addMenuitemUpdater("change float1", &float1);
-    submenu2->addMenuitemUpdater("change bool1", &bool1);
+    auto miu_changebool = submenu2->addMenuitemUpdater("change bool1", &bool1);
+    if (miu_changebool)
+    {
+        miu_changebool->addCallback(addedlog);
+        miu_changebool->addCallback(addedlog2);
+    }
+    if (miu_changint)
+    {
+        miu_changint->setMenuKey(MyMenuKeys::int1updater);
+        miu_changint->addCallback(addedlog);
+        miu_changint->addCallback(addedlog2);
+    }
 
     strcpy(staticString, "first string");
 }
@@ -189,7 +208,7 @@ bool SetTimeout()
     return false;
 }
 
-    string _cstringvalue("-");
+string _cstringvalue("-");
 bool initStringValue()
 {
     cout << "enter an string value:";
@@ -211,6 +230,22 @@ bool DisplayStringValue()
 bool DisplayIntValue()
 {
     cout << "int value : " << _intvalue << '\n';
+    return true;
+}
+bool addedlog(ushort menukey, const char *menuname)
+{
+    cout << "added log : menu-item " << menuname << " called" << endl;
+    if (menukey == MyMenuKeys::int1updater && int1 == 3)
+    {
+        cout << "3 has been provided, addedlog callback break, addedlog2 will not be called" << endl;
+        return false;
+    }
+    return true;
+}
+
+bool addedlog2()
+{
+    cout << "added log 2" << endl;
     return true;
 }
 bool _switchmenuValue1 = false;

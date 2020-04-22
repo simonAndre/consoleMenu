@@ -13,10 +13,6 @@ SubMenu::SubMenu(Menubase *menuinstance, const char *label) : Menuitem()
     this->_mid = 0;
 }
 
-bool SubMenu::addSubItem(Menuitem *subitem)
-{
-    return this->_menuinstance->addChild(this, subitem);
-}
 /**
  * @brief add a submenu item hierarchy
  * 
@@ -42,11 +38,13 @@ SubMenu *SubMenu::addSubMenu(const char *label)
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
      */
-bool SubMenu::addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc)
+MenuitemCallback* SubMenu::addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc)
 {
     MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, label, this, menutype::externalFunction, menukey);
-    mic->SetCallback(onselectFunc);
-    return this->_menuinstance->addChild(this, mic);
+    mic->addCallback(onselectFunc);
+    if( this->_menuinstance->addChild(this, mic))
+        return mic;
+    return nullptr;
 }
 
 /**
@@ -60,12 +58,14 @@ bool SubMenu::addMenuitemCallback(const char *label, ushort menukey, fp_callback
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
        */
-bool SubMenu::addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc)
+MenuitemCallback* SubMenu::addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc)
 {
     MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, "", this, menutype::externalFunction, menukey);
-    mic->SetCallback(onselectFunc);
+    mic->addCallback(onselectFunc);
     mic->SetNamingCallback(namingFunc);
-    return this->_menuinstance->addChild(this, mic);
+    if(this->_menuinstance->addChild(this, mic))
+        return mic;
+    return nullptr;
 }
 
 /**
@@ -78,11 +78,13 @@ bool SubMenu::addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, 
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
      */
-bool SubMenu::addMenuitemCallback(const char *label, fp_callback1 onselectFunc)
+MenuitemCallback* SubMenu::addMenuitemCallback(const char *label, fp_callback1 onselectFunc)
 {
     MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, label, this, menutype::externalFunction, (ushort)CONSOLEMENU_NOMENUKEY);
-    mic->SetCallback(onselectFunc);
-    return this->_menuinstance->addChild(this, mic);
+    mic->addCallback(onselectFunc);
+    if(this->_menuinstance->addChild(this, mic))
+        return mic;
+    return nullptr;
 }
 
 /**
@@ -95,12 +97,14 @@ bool SubMenu::addMenuitemCallback(const char *label, fp_callback1 onselectFunc)
      * @return true : new menu-item correctly added to the collection.
      * @return false : an issue occured (typically, check the unicity of menukey)
      */
-bool SubMenu::addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc)
+MenuitemCallback* SubMenu::addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc)
 {
     MenuitemCallback *mic = new MenuitemCallback(this->_menuinstance, "", this, menutype::externalFunction, CONSOLEMENU_NOMENUKEY);
-    mic->SetCallback(onselectFunc);
+    mic->addCallback(onselectFunc);
     mic->SetNamingCallback(namingFunc);
-    return this->_menuinstance->addChild(this, mic);
+    if(this->_menuinstance->addChild(this, mic))
+        return mic;
+    return nullptr;
 }
 
 /**
@@ -112,13 +116,15 @@ bool SubMenu::addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 ons
      * @return true 
      * @return false 
      */
-bool SubMenu::addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize)
+MenuitemUpdaterbase *SubMenu::addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize)
 {
     MenuitemUpdater<char *> *miu = new MenuitemUpdater<char *>(this->_menuinstance, label, this, menutype::variableUpdater_s);
     miu->setVarToUpdate(variableToUpdate);
     miu->setInputTrials(this->_menuinstance->getOptions().badInputRepeats);
     miu->setStringToUpdateSize(stringsize);
-    return this->_menuinstance->addChild(this, miu);
+    if( this->_menuinstance->addChild(this, miu))
+        return miu;
+    return nullptr;
 }
 
 } // namespace CONSOLEMENU_NAMESPACE

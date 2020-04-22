@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "../commontypes.h"
 #include "specialTypes.h"
+#include <vector>
 
 namespace CONSOLEMENU_NAMESPACE
 {
@@ -15,6 +16,9 @@ class SubMenu;
 class Menuitem
 {
 private:
+    std::vector<fp_callback1> _callbacksForm1;
+    std::vector<fp_callback3> _callbacksForm3;
+
 protected:
     Menubase *_menuinstance{nullptr};
     ushort _mid = 0;
@@ -42,10 +46,16 @@ public:
     SubMenu *getParent();
     void setParent(SubMenu *parent);
     void setName(const char *name);
-    const char *getName();
+    virtual const char *getLabel();
     void setType(menutype type);
     menutype getType();
     virtual ushort getMenuKey();
+    /**
+     * @brief add a Menu Key to this menu-item (throw runtimeExeption if this menukey alreaky exists)
+     * 
+     * @param menukey 
+     */
+    void setMenuKey(ushort menukey);
     ushort getId();
     void setId(ushort id);
     /**
@@ -57,6 +67,24 @@ public:
     virtual void display(ushort idx_menu);
 
     virtual bool selectAction();
+
+    /**
+ * @brief Add a callback function to this menuitem (aditive feature : don't override preexisting defined actions)
+ * 
+ * @param newcallback prototype form = [bool function();]
+ * @return true 
+ * @return false 
+ */
+    void addCallback(fp_callback1 newcallback);
+
+    /**
+ * @brief Add a callback function to this menuitem (aditive feature : don't override preexisting defined actions)
+ * 
+ * @param newcallback prototype form = [bool function(ushort menukey,const char* itemlabel);]
+ * @return true 
+ * @return false 
+ */
+    void addCallback(fp_callback3 newcallback);
 };
 
 } // namespace CONSOLEMENU_NAMESPACE

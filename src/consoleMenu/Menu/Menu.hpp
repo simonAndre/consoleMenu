@@ -69,7 +69,16 @@ public:
     virtual bool addChild(SubMenu *parent, Menuitem *child) override
     {
         child->setParent(parent);
-        return insertMewMenuitem(child);
+        try
+        {
+            insertMewMenuitem(child);
+        }
+        catch (std::runtime_error &e)
+        {
+            IoHelpers::IOdisplayLn(e.what());
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -131,6 +140,17 @@ public:
         displayMenu(parent, nullptr);
     }
 
+    virtual void addMenuKey(ushort menukey, ushort menuid) override
+    {
+        if (_menukeys.find(menukey) != _menukeys.end())
+        {
+            memset(_errorbuffer, 0, sizeof _errorbuffer);
+            sprintf(_errorbuffer, "a menuitem was already declared in the menuitem collection with the key {}", menukey);
+            throw std::runtime_error(_errorbuffer);
+        }
+        _menukeys[menukey] = menuid;
+    }
+
 private:
     std::array<Menuitem *, sizeMenu + 2> _menuArray; // sizeMenu+2 to handle 2 added special menuitems : back and exit
     std::map<ushort, ushort> _menukeys;              // dictionary of menykeys:menuid
@@ -147,7 +167,7 @@ private:
     bool _isserialmenuative = false;
 #endif
 
-    bool insertMewMenuitem(Menuitem *mi)
+    void insertMewMenuitem(Menuitem *mi)
     {
         if (_lastmenuindex > sizeMenu + 2)
         {
@@ -160,17 +180,10 @@ private:
 
         if (mi->getMenuKey() != CONSOLEMENU_NOMENUKEY)
         {
-            if (_menukeys.find(mi->getMenuKey()) != _menukeys.end())
-            {
-                memset(_errorbuffer, 0, sizeof _errorbuffer);
-                sprintf(_errorbuffer, "a menuitem was already declared in the menuitem collection with the key {}", mi->getMenuKey());
-                return false;
-            }
-            _menukeys[mi->getMenuKey()] = mi->getId();
+            this->addMenuKey(mi->getMenuKey(), mi->getId());
         }
         _menuArray[_lastmenuindex] = mi;
         _lastmenuindex++;
-        return true;
     }
 
     /**
@@ -200,15 +213,29 @@ private:
 
         _rootmenuitem = new SubMenu(this, "");
         Menuitem *miroot = (Menuitem *)_rootmenuitem;
-        if (!insertMewMenuitem(miroot))
+
+        try
+        {
+            insertMewMenuitem(miroot);
+        }
+        catch (std::runtime_error &e)
         {
             delete _rootmenuitem;
+            IoHelpers::IOdisplay("error inserting root menu-item");
+            IoHelpers::IOdisplayLn(e.what());
             return false;
         }
+
         _backmenuitem = new MenuitemBack(this);
-        if (!insertMewMenuitem(_backmenuitem))
+        try
+        {
+            insertMewMenuitem(_backmenuitem);
+        }
+        catch (std::runtime_error &e)
         {
             delete _backmenuitem;
+            IoHelpers::IOdisplay("error inserting back menu-item");
+            IoHelpers::IOdisplayLn(e.what());
             return false;
         }
 
@@ -218,9 +245,15 @@ private:
     bool appendLastItems()
     {
         _exitmenuitem = new Menuitem(this, CONSOLEMENU_MENU_EXIT, NULL, menutype::exit);
-        if (!insertMewMenuitem(_exitmenuitem))
+        try
+        {
+            insertMewMenuitem(_exitmenuitem);
+        }
+        catch (std::runtime_error &e)
         {
             delete _exitmenuitem;
+            IoHelpers::IOdisplay("error inserting exit menu-item");
+            IoHelpers::IOdisplayLn(e.what());
             return false;
         }
         return true;
@@ -246,7 +279,7 @@ private:
         else
         {
             IoHelpers::IOdisplay("---- ");
-            IoHelpers::IOdisplay(parent->getName());
+            IoHelpers::IOdisplay(parent->getLabel());
             IoHelpers::IOdisplay(" ----\n");
         }
 
