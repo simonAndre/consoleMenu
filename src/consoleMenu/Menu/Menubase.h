@@ -44,5 +44,7 @@ public:
     virtual void launchMenu();
 
     virtual void LoopCheckSerial();
+
+    virtual void addMenuKey(ushort menukey, ushort menuid);
 };
 } // namespace CONSOLEMENU_NAMESPACE

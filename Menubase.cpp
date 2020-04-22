@@ -59,6 +59,8 @@ ushort Menubase::size() { throw std::runtime_error("call to base function not im
 
 void Menubase::displayMenu(SubMenu *parent [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
 
+void Menubase::addMenuKey(ushort menukey [[gnu::unused]], ushort menuid [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
+
 void Menubase::launchMenu()
 {
     throw std::runtime_error("call to base function not implemented");

@@ -26,18 +26,8 @@ public:
 
     MenuitemCallback();
 
-    void SetCallback(fp_callback1 menuFonction);
-    void SetCallback(fp_callback3 menuFonction);
     void SetNamingCallback(fp_namingcallback namingFonction);
     void setMenuKey(ushort key);
-    virtual void display(ushort idx_menu) override;
-
-    /**
- * @brief call the menu function
- * 
- * @return true if call was successfull (return bool from the callback).
- * if not successfull, false to prompt again in the outside loop. 
- */
-    virtual bool selectAction() override;
+    virtual const char *getLabel() override;
 };
 } // namespace CONSOLEMENU_NAMESPACE

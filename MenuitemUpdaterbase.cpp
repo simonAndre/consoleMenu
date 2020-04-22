@@ -47,6 +47,7 @@ bool MenuitemUpdaterbase::selectAction()
     this->displayCurrentValue();
     IoHelpers::IOdisplayLn("");
     this->takeUserInput(); // return value is not handled for now
+    Menuitem::selectAction();   //call base class to trigger optionale added callbacks
     return false;          //to stay in the menu
 }
 
