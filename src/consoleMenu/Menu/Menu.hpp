@@ -68,7 +68,7 @@ public:
 
     virtual bool addChild(SubMenu *parent, Menuitem *child) override
     {
-        child->setParent(parent);
+        child->SetParent(parent);
         try
         {
             insertMewMenuitem(child);
@@ -79,6 +79,11 @@ public:
             return false;
         }
         return true;
+    }
+
+    virtual SubMenu *addSubMenu(const char *label) override
+    {
+       return  _rootmenuitem->addSubMenu(label);
     }
 
     /**
@@ -151,6 +156,10 @@ public:
         _menukeys[menukey] = menuid;
     }
 
+
+
+
+
 private:
     std::array<Menuitem *, sizeMenu + 2> _menuArray; // sizeMenu+2 to handle 2 added special menuitems : back and exit
     std::map<ushort, ushort> _menukeys;              // dictionary of menykeys:menuid
@@ -162,6 +171,7 @@ private:
     fp_IOinput _inputCallback;
     fp_IOinputId _inputMenuEntry;
     char _errorbuffer[150]{'\0'};
+    bool _finalconfigurationDone = false;
 
 #if CONSOLEMENU_EMBEDDED_MODE
     bool _isserialmenuative = false;
@@ -176,7 +186,7 @@ private:
             throw std::runtime_error(_errorbuffer);
         }
 
-        mi->setId(_lastmenuindex);
+        mi->SetId(_lastmenuindex);
 
         if (mi->getMenuKey() != CONSOLEMENU_NOMENUKEY)
         {
@@ -242,20 +252,46 @@ private:
         return true;
     }
 
-    bool appendLastItems()
+    bool finalConfiguration()
     {
-        _exitmenuitem = new Menuitem(this, CONSOLEMENU_MENU_EXIT, NULL, menutype::exit);
-        try
+        for (ushort i = 0; i < _lastmenuindex; i++)
         {
-            insertMewMenuitem(_exitmenuitem);
+            Menuitem *mi = _menuArray[i];
+            if (mi && mi->getType() == menutype::hierarchymenu){
+                // add grouped callbacks to every childs
+
+                SubMenu *sm = (SubMenu *)mi;
+                Menuitem **childs = sm->getChilds();
+                std::vector<fp_callback1>::const_iterator itcallbacks;
+                for (itcallbacks = sm->callbacksForChilds.begin(); itcallbacks != sm->callbacksForChilds.end(); ++itcallbacks)
+                {
+                    for (size_t j = 0; j < sm->getChildCount(); j++)
+                    {
+                        Menuitem* childmi = childs[j];
+                        childmi->addCallback(*itcallbacks);
+                    }
+                }
+                delete childs;
+            }
         }
-        catch (std::runtime_error &e)
+
+        // add exit menu items
+        if (!_exitmenuitem)
         {
-            delete _exitmenuitem;
-            IoHelpers::IOdisplay("error inserting exit menu-item");
-            IoHelpers::IOdisplayLn(e.what());
-            return false;
+            _exitmenuitem = new Menuitem(this, CONSOLEMENU_MENU_EXIT, NULL, menutype::exit);
+            try
+            {
+                insertMewMenuitem(_exitmenuitem);
+            }
+            catch (std::runtime_error &e)
+            {
+                delete _exitmenuitem;
+                IoHelpers::IOdisplay("error inserting exit menu-item");
+                IoHelpers::IOdisplayLn(e.what());
+                return false;
+            }
         }
+
         return true;
     }
 
@@ -269,9 +305,10 @@ private:
     std::map<ushort, ushort> displayMenu(SubMenu *parent, SubMenu *backparent)
     {
 
-        if (!_exitmenuitem)
+        if (!_finalconfigurationDone)
         {
-            appendLastItems();
+            finalConfiguration();
+            _finalconfigurationDone = true;
         }
 
         if (parent == _rootmenuitem)
@@ -302,7 +339,7 @@ private:
                     if (mi->getType() == menutype::back)
                     {
                         MenuitemBack *mib = (MenuitemBack *)mi;
-                        mib->setParent(parent);
+                        mib->SetParent(parent);
                     }
                     menuitems.insert(std::pair<ushort, ushort>(ix, mi->getId()));
                 }
@@ -324,6 +361,7 @@ private:
     void launchMenu(SubMenu *parent, SubMenu *backparent)
     {
         bool done = false;
+        
         _menuDefaultTimeout = _menuoptions.expirationTimeSec;
 
         do
@@ -361,6 +399,7 @@ private:
                 {
                     Menuitem *mi = _menuArray[menuitems.at(inputi)];
                     SubMenu *mih = (SubMenu *)mi;
+                    SelectActionResult actionres;
                     switch (mi->getType())
                     {
                     case menutype::hierarchymenu:
@@ -379,7 +418,8 @@ private:
                         return;
                         break;
                     default:
-                        done = mi->selectAction();
+                        actionres = mi->selectAction();
+                        done = actionres.exitRequested;
                         break;
                     }
                 }
@@ -391,5 +431,5 @@ private:
         } while (!done);
         _displayCallback(CONSOLEMENU_MENU_EXITED);
     }
-}; // namespace CONSOLEMENU_NAMESPACE
+};
 } // namespace CONSOLEMENU_NAMESPACE

@@ -21,7 +21,7 @@ Menuitem::Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent
 {
     this->_menuinstance = menuinstance;
     this->_mparent = parent;
-    this->_mname = std::string(menuname);
+    this->SetLabel(menuname);
     this->_mtype = type;
 }
 
@@ -34,13 +34,22 @@ SubMenu *Menuitem::getParent()
 {
     return (SubMenu *)this->_mparent;
 }
-void Menuitem::setParent(SubMenu *parent)
+Menuitem *Menuitem::SetParent(SubMenu *parent)
 {
-    this->_mparent = parent;
+    if (!this->flags.Get(menuitemflags::menuparentset) || this->getType()== menutype::back)
+    {
+        this->_mparent = parent;
+        this->flags.Set(menuitemflags::menuparentset, true);
+        return this;
+    }
+    else
+        throw std::runtime_error("SetParent can be called only once per menu-item");
 }
-void Menuitem::setName(const char *name)
+    
+Menuitem* Menuitem::SetLabel(const char *name)
 {
-    this->_mname = std::string(name);
+    this->_mname =name;
+    return this;
 }
 
 void Menuitem::setType(menutype type)
@@ -59,19 +68,39 @@ ushort Menuitem::getId()
 {
     return this->_mid;
 }
-void Menuitem::setId(ushort id)
+Menuitem* Menuitem::SetId(ushort id)
 {
-    this->_mid = id;
+    if (!this->flags.Get(menuitemflags::menuidset))
+    {
+        this->_mid = id;
+        this->flags.Set(menuitemflags::menuidset, true);
+        return this;
+    }
+    else
+        throw std::runtime_error("SetId can be called only once per menu-item");
 }
 
 const char *Menuitem::getLabel()
 {
-    return this->_mname.c_str();
+    return this->_mname;
 }
-void Menuitem::setMenuKey(ushort menukey)
+Menuitem *Menuitem::addExit()
 {
-    this->_menuinstance->addMenuKey(menukey, this->getId());
-    this->_mkey = menukey;
+    this->flags.Set(menuitemflags::exitemnu, true);
+    return this;
+}
+
+Menuitem *Menuitem::setMenuKey(ushort menukey)
+{
+    if (!this->flags.Get(menuitemflags::menukeyset))       
+    {
+        this->_menuinstance->addMenuKey(menukey, this->getId());
+        this->_mkey = menukey;
+        this->flags.Set(menuitemflags::menukeyset, true);
+        return this;
+    }
+    else
+        throw std::runtime_error("setMenuKey can be called only once per menu-item");
 }
 /**
  * @brief display the menuitem 
@@ -91,35 +120,42 @@ void Menuitem::display(ushort idx_menu)
 /**
  * @brief call the menu functions. Stop the callback call on the first failing callback (returning false) 
  * 
- * @return true if call was successfull for all callbacks (return true from each callbacks).
- * if not successfull, false to prompt again in the outside loop. 
+ * @return SelectActionResult
  */
-bool Menuitem::selectAction()
+SelectActionResult Menuitem::selectAction()
 {
     IoHelpers::IOdisplayLn("");
     std::vector<fp_callback1>::const_iterator it_form1;
     std::vector<fp_callback3>::const_iterator it_form3;
+    SelectActionResult res;
+
+    res.exitRequested = this->flags.Get(menuitemflags::exitemnu);
+
     for (it_form1 = _callbacksForm1.begin(); it_form1 != _callbacksForm1.end(); ++it_form1)
     {
-        if(!(*it_form1)())      // call the callback form1
-            return false;
+        res.callbacksSuccessfull &= (*it_form1)(); // call the callback form1
+        if (!res.callbacksSuccessfull && this->_menuinstance->getOptions().breakCallbackChainOnFirstError)
+            return res;
     }
     for (it_form3 = _callbacksForm3.begin(); it_form3 != _callbacksForm3.end(); ++it_form3)
     {
-        if(!(*it_form3)(this->getMenuKey(),this->getLabel())) // call the callback form3
-            return false;
+        res.callbacksSuccessfull &= (*it_form3)(this->getMenuKey(), this->getLabel()); // call the callback form3
+        if (!res.callbacksSuccessfull && this->_menuinstance->getOptions().breakCallbackChainOnFirstError)
+            return res;
     }
-    return true;
+    return res;
 }
 
-void Menuitem::addCallback(fp_callback1 newcallback)
+Menuitem *Menuitem::addCallback(fp_callback1 newcallback)
 {
     this->_callbacksForm1.push_back(newcallback);
+    return this;
 }
 
-void Menuitem::addCallback(fp_callback3 newcallback)
+Menuitem *Menuitem::addCallback(fp_callback3 newcallback)
 {
     this->_callbacksForm3.push_back(newcallback);
+    return this;
 }
 
 } // namespace CONSOLEMENU_NAMESPACE

@@ -54,6 +54,22 @@ please choose an action: >
 you need to provide the size of the menu collection as a template parameter. : 
 > Menubase *mymenu =new Menu<**menu-size**>(); 
 
+### fluent configuration
+
+The base element of the configuration is the [menu-item](#Menu-items).
+
+Each menu-item match a line in the menu. Menu-items can be organized hierarchically within submenus.
+
+To start the menu configuration, from the menuinstance use the method addSubMenu or get the root menu-item with getRootMenu method.
+
+From the submenu, you can add other child items with one of this fluent method : addSubMenu, addMenuitemCallback, addMenuitemUpdater...
+
+And you can chain from there the configuration of the menu-item properties : 
+
+```C++
+mysubmenu->addMenuitemCallback("menuitem label")->setMenuKey(2)->addCallback(firstCallback)->addCallback(secondCallback)->addExit(); 
+```
+this example add a menu-item of type MenuitemCallback to the submenu [mysubmenu] and set its menukey to 2 (optional, internal id are automatically given) and hook 2 callbacks and signal the a call to this menu-item will exit from the menu to resume the control flow to the main program.
 
 ### setup : 
 
@@ -140,9 +156,9 @@ mymenu->LoopCheckSerial();
 
 simple function based on one of the following prototypes. 
 choosing one prototype or another is up to you depending on your implementation choices.
-For all of these prototypes, the return bool value is meant to signal a menu exit  :
-+ if its **true** : the menu is exited just after the callback and the control flow is resumed right after the Menu::launchMenu() method (or the Menu::LoopCheckSerial() method).
-+ if its **false** : the menu is reloaded just after the callback to let the user select another menu option. 
+For all of these prototypes, the return bool value is meant to signal a break in the callback chain :
++ if its **true** : signal a normal execution of the callback, if other callback follow in the chain, they will be executed afterward, if not the control is given back to display the menu again to let the user select another menu option.
++ if its **false** : break the callback chain : no further execution of callbacks and get back to the menu display (if previous callback where declared, they have already completed). 
 
 #### form 1
 
@@ -286,8 +302,7 @@ prototypes :
  * @param label 
  * @param variableToUpdate : pointer to the variable to be updated 
  * @param stringsize : size max of the c-string (buffer of char) 
- * @return true 
- * @return false 
+ * @return MenuitemUpdaterbase* to chain with other configuration for this MenuItem
  */
   template <typename T>
   bool addMenuitemUpdater(const char *label, T *variableToUpdate)
@@ -304,8 +319,7 @@ prototypes :
    * @param label 
    * @param variableToUpdate : pointer to the variable to be updated
    * @param stringsize : size max of the c-string (buffer of char)
-   * @return true 
-   * @return false 
+   * @return MenuitemUpdaterbase* to chain with other configuration for this MenuItem
    */
   bool addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize);
 ```
