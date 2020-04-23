@@ -5,29 +5,27 @@ namespace CONSOLEMENU_NAMESPACE
 {
 
 /**
-     * @brief callback called on menu selection. form without parameters.
-     * 
-     * @return if the return value is true : exit the menu after execution of this function,
-     * else stay in the current menu and wait for another action
-     */
+* @brief callback called on menu selection. form without parameters.
+* 
+* @return false if an error occured or just to break the callbacks chain. If False, in case of chained callbacks, further callbacks won't be called
+*/
 typedef bool (*fp_callback1)(void);
 
 /**
-     * @brief callback called on menu selection
-     * 
-     * @param <menu name> will be the menuitem name
-     * @return if the return value is true : exit the menu after execution of this function,
-     * else stay in the current menu and wait for another action
+* @brief callback called on menu selection
+* 
+* @param <menu name> will be the menuitem name
+* @return false if an error occured or just to break the callbacks chain. If False, in case of chained callbacks, further callbacks won't be called
+
      */
 typedef bool (*fp_callback2)(const char *);
 
 /**
-     * @brief callback called on menu selection
-     * 
-     * @param <key> will be the menuitem key
-     * @param <menu name> will be the menuitem name
-     * @return if the return value is true : exit the menu after execution of this function,
-     * else stay in the current menu and wait for another action
+* @brief callback called on menu selection
+* 
+* @param <key> will be the menuitem key
+* @param <menu name> will be the menuitem name
+* @return false if an error occured or just to break the callbacks chain. If False, in case of chained callbacks, further callbacks won't be called
      */
 typedef bool (*fp_callback3)(ushort, const char *);
 typedef void (*fp_IOdisplay)(const char *);
@@ -47,7 +45,13 @@ typedef struct
      bool addCurrentState = true; // if true : display the current state for each menuitem, for updater menu items only.
      ushort badInputRepeats = 1;  // nb of allowed trials for bad input before failing the input of a menu.
      ushort expirationTimeSec = CONSOLEMENU_MENU_DEFAULTMENUSELECTIONTIMEOUT;// time after when the menu is automatically exited without any user interaction.
+     bool breakCallbackChainOnFirstError = true;  //break the callback chain : no further execution of callbacks and get back to the menu display (if previous callback where declared, they have already completed).
 } MenuOptions;
+
+typedef struct{
+     bool callbacksSuccessfull=true;    // action completed successfully
+     bool exitRequested=false;           // one of the callback require to exit of the menu
+} SelectActionResult;
 
 enum menutype
 {

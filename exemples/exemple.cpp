@@ -15,6 +15,7 @@ bool getVersionMenu();
 bool switchMenu(ushort menukey, const char *menuname);
 bool addedlog(ushort menukey, const char *menuname);
 bool addedlog2();
+bool addedlog3();
 const char *switchMenuDisplay(ushort menukey);
 bool testIO();
 bool displaystr1();
@@ -67,15 +68,14 @@ void SetupMenu()
     // menus & submenus definition
     // root menus
     SubMenu *root = mymenu->getRootMenu(); //get the root menu-item
+    // submenu definition - method 1 : from the root menu
     SubMenu *submenu1 = root->addSubMenu("Submenu inputs w callbacks");
-    SubMenu *submenu2 = root->addSubMenu("submenu inputs w updaters");
-    root->addMenuitemCallback("simple menu and exit", simpleMenu);                          // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
-    auto mic_getversion = root->addMenuitemCallback("consoleMenu version", getVersionMenu); // callback with menu name passed as parameter, see function menuParamName
-    if (mic_getversion)
-    {
-        mic_getversion->addCallback(addedlog);
-        mic_getversion->addCallback(addedlog2);
-    }
+    // submenu definition - method 2 : from the global menu instance
+    SubMenu *submenu2 = mymenu->addSubMenu("submenu inputs w updaters")->addCallbackToChilds(addedlog3);
+    // SubMenu *submenu2 = root->addSubMenu("submenu inputs w updaters")->addCallbackToChilds(addedlog3);
+    root->addMenuitemCallback("simple menu and exit", simpleMenu)->addExit();                          // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
+    // callback with menu name passed as parameter, see function menuParamName and callback chained
+    root->addMenuitemCallback("consoleMenu version", getVersionMenu)->addCallback(addedlog)->addCallback(addedlog2);
 
     root->addMenuitemCallback("test prompted inputs", testIO); // callback with menu name passed as parameter, see function menuParamName
     // level 2 menus, under the item [submenu1]
@@ -88,7 +88,7 @@ void SetupMenu()
     submenu1->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu1, switchMenu);
 
     // more levels can be chained...
-    SubMenu *submenu3 = submenu1->addSubMenu("sub menu 2");
+    SubMenu *submenu3 = submenu1->addSubMenu("sub menu 2")->addCallbackToChilds(addedlog3);
     submenu3->addMenuitemCallback("build infos", buildInfos); //still a simple menu
     // another dynamic menu bind to the same callbacks with a different key
     submenu3->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu2, switchMenu);
@@ -97,12 +97,9 @@ void SetupMenu()
     submenu2->addMenuitemUpdater("change str1", (char *)staticString, sizeof(staticString));
     auto miu_changint = submenu2->addMenuitemUpdater("change int1, enter 3 will break the 1st callback", &int1);
     submenu2->addMenuitemUpdater("change float1", &float1);
-    auto miu_changebool = submenu2->addMenuitemUpdater("change bool1", &bool1);
-    if (miu_changebool)
-    {
-        miu_changebool->addCallback(addedlog);
-        miu_changebool->addCallback(addedlog2);
-    }
+    submenu2->addMenuitemUpdater("change bool1", &bool1)->addCallback(addedlog)->addCallback(addedlog2);
+    
+    
     if (miu_changint)
     {
         miu_changint->setMenuKey(MyMenuKeys::int1updater);
@@ -166,12 +163,12 @@ bool buildInfos()
     cout << "__cplusplus : " << __cplusplus << '\n';
     cout << "build time : " << __TIMESTAMP__ << '\n';
     cout << "come back to the menu" << '\n';
-    return false;
+    return true;
 }
 bool getVersionMenu()
 {
     cout << "current consoleMenu version: " << mymenu->getVersion() << '\n';
-    return false;
+    return true;
 }
 
 int _intvalue;
@@ -187,7 +184,7 @@ bool initIntValue()
         std::cerr << e.what() << '\n';
         return false;
     }
-    return false;
+    return true;
 }
 int _timeoutvalue;
 bool SetTimeout()
@@ -205,7 +202,7 @@ bool SetTimeout()
         std::cerr << e.what() << '\n';
         return false;
     }
-    return false;
+    return true;
 }
 
 string _cstringvalue("-");
@@ -220,12 +217,12 @@ bool initStringValue()
     {
         std::cerr << e.what() << '\n';
     }
-    return false;
+    return true;
 }
 bool DisplayStringValue()
 {
     cout << "string content : " << _cstringvalue << '\n';
-    return false;
+    return true;
 }
 bool DisplayIntValue()
 {
@@ -248,6 +245,11 @@ bool addedlog2()
     cout << "added log 2" << endl;
     return true;
 }
+bool addedlog3()
+{
+    cout << "added log 3" << endl;
+    return true;
+}
 bool _switchmenuValue1 = false;
 bool _switchmenuValue2 = false;
 bool switchMenu(ushort menukey, const char *menuname)
@@ -266,7 +268,7 @@ bool switchMenu(ushort menukey, const char *menuname)
     default:
         throw std::runtime_error("menu key not implemented is switchMenu");
     }
-    return false;
+    return true;
 }
 char buff[50];
 
@@ -308,11 +310,11 @@ bool testIO()
         IoHelpers::IOdisplay("your entered:");
         IoHelpers::IOdisplayLn(f);
     }
-    return false;
+    return true;
 }
 
 bool displaystr1()
 {
     IoHelpers::IOdisplayLn(staticString);
-    return false;
+    return true;
 }

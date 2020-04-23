@@ -41,21 +41,20 @@ void MenuitemUpdaterbase::setInputTrials(ushort trials)
  * @return true if call was successfull (return bool from the callback).
  * if not successfull, false to prompt again in the outside loop. 
  */
-bool MenuitemUpdaterbase::selectAction()
+SelectActionResult MenuitemUpdaterbase::selectAction()
 {
     IoHelpers::IOdisplay(";current value is : ");
     this->displayCurrentValue();
     IoHelpers::IOdisplayLn("");
-    this->takeUserInput(); // return value is not handled for now
-    Menuitem::selectAction();   //call base class to trigger optionale added callbacks
-    return false;          //to stay in the menu
+    this->takeUserInput();           // return value is not handled for now
+    return Menuitem::selectAction(); //call base class to trigger optionale added callbacks
 }
 
 void MenuitemUpdaterbase::display(ushort idx_menu)
 {
     IoHelpers::IOdisplay(idx_menu);
     IoHelpers::IOdisplay(_menuinstance->getOptions().id_separator);
-    IoHelpers::IOdisplay(_mname.c_str());
+    IoHelpers::IOdisplay(_mname);
     IoHelpers::IOdisplay(" [=");
     this->displayCurrentValue();
     IoHelpers::IOdisplay("]");

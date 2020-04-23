@@ -2,6 +2,7 @@
 #pragma once
 
 #include "specialTypes.h"
+#include <vector>
 namespace CONSOLEMENU_NAMESPACE
 {
 
@@ -26,7 +27,17 @@ public:
 
     virtual SubMenu *getRootMenu();
 
+    /**
+ * @brief add a submenu item hierarchy
+ * 
+ * @param label : label displayed
+ * @return new SubMenu* created 
+ */
+    virtual SubMenu *addSubMenu(const char *label);
+
     virtual bool addChild(SubMenu *parent, Menuitem *child);
+
+    // virtual std::vector<Menuitem> getChildsOf(SubMenu *parent);
     /**
  * @brief Get a menuitem the By its menuKey
  * 

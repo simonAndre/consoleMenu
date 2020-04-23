@@ -3,7 +3,10 @@
 #include "src/consoleMenu/Menu/Menubase.h"
 #include <stdexcept>
 #include <cstdio>
-namespace CONSOLEMENU_NAMESPACE
+#include <vector>
+
+#define CONSOLEMENU_NOTIMPLEMENTED "call to base function not implemented"
+namespace CONSOLEMENU_NAMESPACE 
 {
 
 static char _consolemenuversion[10]{'\0'};
@@ -42,7 +45,7 @@ SubMenu *Menubase::getRootMenu()
 
 bool Menubase::addChild(SubMenu *parent [[gnu::unused]], Menuitem *child [[gnu::unused]])
 {
-    throw std::runtime_error("call to base function not implemented");
+    throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
 }
 
 /**
@@ -51,23 +54,34 @@ bool Menubase::addChild(SubMenu *parent [[gnu::unused]], Menuitem *child [[gnu::
  * @param menukey 
  * @return Menuitem 
  */
-Menuitem *Menubase::getByKey(ushort menukey [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
+Menuitem *Menubase::getByKey(ushort menukey [[gnu::unused]]) { throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED); }
 
-Menuitem *Menubase::getById(ushort menuid [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
+Menuitem *Menubase::getById(ushort menuid [[gnu::unused]]) { throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED); }
 
-ushort Menubase::size() { throw std::runtime_error("call to base function not implemented"); }
+ushort Menubase::size() { throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED); }
 
-void Menubase::displayMenu(SubMenu *parent [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
+void Menubase::displayMenu(SubMenu *parent [[gnu::unused]]) { throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED); }
 
-void Menubase::addMenuKey(ushort menukey [[gnu::unused]], ushort menuid [[gnu::unused]]) { throw std::runtime_error("call to base function not implemented"); }
+void Menubase::addMenuKey(ushort menukey [[gnu::unused]], ushort menuid [[gnu::unused]]) { throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED); }
 
 void Menubase::launchMenu()
 {
-    throw std::runtime_error("call to base function not implemented");
+    throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
 }
 
 void Menubase::LoopCheckSerial()
 {
-    throw std::runtime_error("call to base function not implemented");
+    throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
 }
+
+SubMenu *Menubase::addSubMenu(const char *label [[gnu::unused]])
+{
+    throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
+}
+
+// std::vector<Menuitem> Menubase::getChildsOf(SubMenu *parent [[gnu::unused]])
+// {
+//     throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
+// }
+
 } // namespace CONSOLEMENU_NAMESPACE

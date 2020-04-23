@@ -37,7 +37,7 @@ public:
  * @return true if call was successfull (return bool from the callback).
  * if not successfull, false to prompt again in the outside loop. 
  */
-    virtual bool selectAction() override;
+    virtual SelectActionResult selectAction() override;
 
     virtual void display(ushort idx_menu);
 };
