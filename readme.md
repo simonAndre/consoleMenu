@@ -2,6 +2,8 @@
 
 
 (c) Simon ANDRE, 2019
+current version : 0.5.1
+
 
 target : any environment : embedded, linux or windows.
 mainly done for embedded, its main purpose is to be simple and very lightweight with a small memory footprint.
