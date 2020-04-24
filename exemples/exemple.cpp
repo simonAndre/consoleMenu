@@ -26,6 +26,7 @@ char staticString[30];
 int int1 = 1234;
 float float1 = 5688.5567;
 bool bool1;
+int _intvalue;
 
 Menubase *mymenu;
 
@@ -55,7 +56,7 @@ enum MyMenuKeys
 
 void SetupMenu()
 {
-    mymenu = new Menu<19>(); //declare a menu sized for 19 menu-items
+    mymenu = new Menu<21>(); //declare a menu sized for 19 menu-items
 
     // DisplayInfos: IO callback to render the menu
     // WaitforInput: IO callback to wait and read the user input
@@ -80,10 +81,10 @@ void SetupMenu()
     root->addMenuitemCallback("test prompted inputs", testIO); // callback with menu name passed as parameter, see function menuParamName
     // level 2 menus, under the item [submenu1]
     submenu1->addMenuitemCallback("set string", initStringValue);
-    submenu1->addMenuitemCallback("display string and stay", DisplayStringValue);
+    submenu1->addMenuitemCallback("display string", DisplayStringValue);
     submenu1->addMenuitemCallback("set timeout", SetTimeout);
     submenu1->addMenuitemCallback("set int value", initIntValue);
-    submenu1->addMenuitemCallback("display int value and stop", DisplayIntValue);
+    submenu1->addMenuitemCallback("display int value", DisplayIntValue);
     // this menu is dynamic : its name is provided by the function [switchMenuDisplay], it can be updated depending of the context
     submenu1->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu1, switchMenu);
 
@@ -98,8 +99,10 @@ void SetupMenu()
     auto miu_changint = submenu2->addMenuitemUpdater("change int1, enter 3 will break the 1st callback", &int1);
     submenu2->addMenuitemUpdater("change float1", &float1);
     submenu2->addMenuitemUpdater("change bool1", &bool1)->addCallback(addedlog)->addCallback(addedlog2);
-    
-    
+
+    submenu2->addMenuitem()->SetLabel("int1=50")->addLambda([]() { _intvalue = 50; })->addCallback(DisplayIntValue);
+    submenu2->addMenuitem()->SetLabel("int1=100")->addLambda([]() { _intvalue = 100; })->addCallback(DisplayIntValue);
+
     if (miu_changint)
     {
         miu_changint->setMenuKey(MyMenuKeys::int1updater);
@@ -171,7 +174,6 @@ bool getVersionMenu()
     return true;
 }
 
-int _intvalue;
 bool initIntValue()
 {
     cout << "enter an int value:";

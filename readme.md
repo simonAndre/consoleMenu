@@ -2,7 +2,7 @@
 
 
 (c) Simon ANDRE, 2019
-current version : 0.5.1
+current version : 0.6
 
 
 target : any environment : embedded, linux or windows.

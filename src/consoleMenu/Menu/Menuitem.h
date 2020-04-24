@@ -6,6 +6,8 @@
 #include "specialTypes.h"
 #include <vector>
 #include "../wrapfunc.hpp"
+#include <functional>
+
 
 namespace CONSOLEMENU_NAMESPACE
 {
@@ -31,7 +33,9 @@ private:
        _callbacksForm3;
    bitflag flags;
 
-protected:
+   std::vector<std::function<void()>> _lambdas_const;
+
+ protected:
    Menubase *_menuinstance{nullptr};
    ushort _mid = 0;
    SubMenu *_mparent{nullptr};           // if defined, it must be a SubMenu
@@ -105,6 +109,8 @@ public:
  * @return Menuitem* 
  */
    Menuitem *addExit();
+
+   Menuitem *addLambda(std::function<void()> func);
 };
 
 } // namespace CONSOLEMENU_NAMESPACE
