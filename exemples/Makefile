@@ -16,6 +16,8 @@ run: $(EXEC)
 	$(EXEC).exe
 
 all: $(EXEC)
-
+	$(EXEC)
+	run
+	
 clean: 
 	rm  ./$(EXEC)

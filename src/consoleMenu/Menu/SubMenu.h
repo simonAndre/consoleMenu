@@ -14,27 +14,34 @@ namespace CONSOLEMENU_NAMESPACE
 
 class SubMenu : public Menuitem
 {
-    private:
-        std::vector<ushort> _childsid;
+private:
+    std::vector<ushort> _childsid;
 
-    public:
-        std::vector<fp_callback1> callbacksForChilds;
-        SubMenu(Menubase *menuinstance);
-        SubMenu(Menubase *menuinstance, const char *label);
+public:
+    std::vector<fp_callback1> callbacksForChilds;
+    SubMenu(Menubase *menuinstance);
+    SubMenu(Menubase *menuinstance, const char *label);
 
-        SubMenu *SetParent(SubMenu *parent);
-        SubMenu *SetLabel(const char *name);
-        virtual Menuitem* SetId(ushort id) override;
+    SubMenu *SetParent(SubMenu *parent);
+    SubMenu *SetLabel(const char *name);
+    virtual Menuitem *SetId(ushort id) override;
 
-        /**
+    /**
  * @brief add a submenu item hierarchy
  * 
  * @param label : label displayed
  * @return new SubMenu* created 
  */
-        SubMenu *addSubMenu(const char *label);
+    SubMenu *addSubMenu(const char *label);
 
-        /**
+    /**
+ * @brief add a simple menu-item. configuration of the label, the key and callbacks.. must be chain with the set[] or add[] methods.
+ * 
+ * @return Menuitem* 
+ */
+    Menuitem *addMenuitem();
+
+    /**
      * @brief add a submenu item calling a given function - static labelling
      * 
      * @param label : label displayed
@@ -44,9 +51,9 @@ class SubMenu : public Menuitem
      * else stay in the current menu and wait for another action
      * @return MenuitemCallback* to chain with other configuration for this MenuItem
      */
-        MenuitemCallback *addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc);
+    MenuitemCallback *addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc);
 
-        /**
+    /**
      * @brief add a submenu item calling a given function - dynamic labelling
      * 
      * @param namingFunc : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
@@ -56,9 +63,9 @@ class SubMenu : public Menuitem
      * else stay in the current menu and wait for another action
      * @return MenuitemCallback* to chain with other configuration for this MenuItem
        */
-        MenuitemCallback *addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc);
+    MenuitemCallback *addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc);
 
-        /**
+    /**
      * @brief add a submenu item calling a given simple function (no params) - static labelling
      * 
      * @param label : label displayed
@@ -67,9 +74,9 @@ class SubMenu : public Menuitem
      * else stay in the current menu and wait for another action
      * @return MenuitemCallback* to chain with other configuration for this MenuItem
      */
-        MenuitemCallback *addMenuitemCallback(const char *label, fp_callback1 onselectFunc);
+    MenuitemCallback *addMenuitemCallback(const char *label, fp_callback1 onselectFunc);
 
-        /**
+    /**
      * @brief add a submenu item calling a given simple function (no params) - dynamic labelling
      * 
      * @param namingFunc : callback to a function provinding dynamically the menuitem name (possibly given the menukey)
@@ -78,9 +85,9 @@ class SubMenu : public Menuitem
      * else stay in the current menu and wait for another action
      * @return MenuitemUpdaterbase* to chain with other configuration for this MenuItem
      */
-        MenuitemCallback *addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc);
+    MenuitemCallback *addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc);
 
-        /**
+    /**
  * @brief add a menu item designed for one goal : update a value in a given pointer to a variable.
      * 
  * 
@@ -90,15 +97,15 @@ class SubMenu : public Menuitem
  * @param stringsize : size max of the c-string (buffer of char) 
  * @return MenuitemUpdaterbase* to chain with other configuration for this MenuItem
  */
-        template <typename T>
-        MenuitemUpdaterbase *addMenuitemUpdater(const char *label, T *variableToUpdate)
-        {
-            MenuitemUpdater<T> *miu = new MenuitemUpdater<T>(this->_menuinstance, label, this, menutype::variableUpdater_i);
-            miu->setVarToUpdate(variableToUpdate);
-            miu->setInputTrials(this->_menuinstance->getOptions().badInputRepeats);
-            if (this->_menuinstance->addChild(this, miu))
-                return miu;
-            return nullptr;
+    template <typename T>
+    MenuitemUpdaterbase *addMenuitemUpdater(const char *label, T *variableToUpdate)
+    {
+        MenuitemUpdater<T> *miu = new MenuitemUpdater<T>(this->_menuinstance, label, this, menutype::variableUpdater_i);
+        miu->setVarToUpdate(variableToUpdate);
+        miu->setInputTrials(this->_menuinstance->getOptions().badInputRepeats);
+        if (this->_menuinstance->addChild(this, miu))
+            return miu;
+        return nullptr;
     }
 
     /**
@@ -114,7 +121,6 @@ class SubMenu : public Menuitem
     size_t getChildCount();
 
     Menuitem **getChilds();
-
 
     /**
  * @brief Add a callback function for all child item added to this submenu (aditive feature : don't override preexisting defined actions)

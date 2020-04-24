@@ -75,6 +75,17 @@ MenuitemCallback *SubMenu::addMenuitemCallback(const char *label, ushort menukey
     return nullptr;
 }
 
+Menuitem *SubMenu::addMenuitem(){
+    Menuitem *newmi = new Menuitem();
+    newmi->setMenuInstance(this->_menuinstance);
+    if (this->_menuinstance->addChild(this, newmi))
+    {
+        _childsid.push_back(newmi->getId());
+        return newmi;
+    }
+    return nullptr;
+}
+
 /**
      * @brief add a submenu item calling a given function - dynamic labelling
      * 

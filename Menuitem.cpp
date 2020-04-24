@@ -125,18 +125,28 @@ void Menuitem::display(ushort idx_menu)
 SelectActionResult Menuitem::selectAction()
 {
     IoHelpers::IOdisplayLn("");
-    std::vector<fp_callback1>::const_iterator it_form1;
-    std::vector<fp_callback3>::const_iterator it_form3;
     SelectActionResult res;
 
     res.exitRequested = this->flags.Get(menuitemflags::exitemnu);
 
+//execute the lambdas
+    std::vector<std::function<void()>>::const_iterator it_lambda;
+    for (it_lambda = _lambdas_const.begin(); it_lambda != _lambdas_const.end(); ++it_lambda)
+    {
+        (*it_lambda)(); // call the lambda
+    }
+
+    //execute the _callbacksForm1
+    std::vector<fp_callback1>::const_iterator it_form1;
     for (it_form1 = _callbacksForm1.begin(); it_form1 != _callbacksForm1.end(); ++it_form1)
     {
         res.callbacksSuccessfull &= (*it_form1)(); // call the callback form1
         if (!res.callbacksSuccessfull && this->_menuinstance->getOptions().breakCallbackChainOnFirstError)
             return res;
     }
+
+    //execute the _callbacksForm3
+    std::vector<fp_callback3>::const_iterator it_form3;
     for (it_form3 = _callbacksForm3.begin(); it_form3 != _callbacksForm3.end(); ++it_form3)
     {
         res.callbacksSuccessfull &= (*it_form3)(this->getMenuKey(), this->getLabel()); // call the callback form3
@@ -155,6 +165,12 @@ Menuitem *Menuitem::addCallback(fp_callback1 newcallback)
 Menuitem *Menuitem::addCallback(fp_callback3 newcallback)
 {
     this->_callbacksForm3.push_back(newcallback);
+    return this;
+}
+
+Menuitem *Menuitem::addLambda(std::function < void()> func)
+{
+   this->_lambdas_const.push_back(func);
     return this;
 }
 
