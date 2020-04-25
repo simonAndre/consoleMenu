@@ -12,8 +12,8 @@ private:
     T *_variableToUpdate{nullptr};
 
 public:
-    MenuitemUpdater(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type)
-        : MenuitemUpdaterbase(menuinstance, menuname, parent, type)
+    MenuitemUpdater(Menubase *menuinstance, const char *menuname, SubMenu *parent)
+        : MenuitemUpdaterbase(menuinstance, menuname, parent)
     {
     }
     MenuitemUpdater() : MenuitemUpdaterbase()
@@ -64,13 +64,10 @@ private:
     size_t _stringToUpdateSize;
 
 public:
-    MenuitemUpdater(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type)
-        : MenuitemUpdaterbase(menuinstance, menuname, parent, type)
-    {
-    }
-    MenuitemUpdater() : MenuitemUpdaterbase()
-    {
-    }
+    MenuitemUpdater(Menubase *menuinstance, const char *menuname, SubMenu *parent)
+        : MenuitemUpdaterbase(menuinstance, menuname, parent)    {}
+    
+    MenuitemUpdater() : MenuitemUpdaterbase(){}
 
     void setStringToUpdateSize(size_t size)
     {
@@ -119,8 +116,8 @@ private:
     bool *_variableToUpdate{nullptr};
 
 public:
-    MenuitemUpdater(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type)
-        : MenuitemUpdaterbase(menuinstance, menuname, parent, type)
+    MenuitemUpdater(Menubase *menuinstance, const char *menuname, SubMenu *parent)
+        : MenuitemUpdaterbase(menuinstance, menuname, parent)
     {
     }
     MenuitemUpdater() : MenuitemUpdaterbase()

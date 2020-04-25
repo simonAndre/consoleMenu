@@ -35,6 +35,8 @@ private:
 
    std::vector<std::function<void()>> _lambdas_const;
 
+   fp_namingcallback *_mNamingFonction{nullptr};
+
  protected:
    Menubase *_menuinstance{nullptr};
    ushort _mid = 0;
@@ -55,13 +57,15 @@ public:
  * @param menuFonction 
  * @param type 
  */
-   Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type);
+   Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent);
 
    void setMenuInstance(Menubase *mi);
 
    SubMenu *getParent();
    Menuitem *SetParent(SubMenu *parent);
    Menuitem *SetLabel(const char *name);
+   Menuitem *SetNamingCallback(fp_namingcallback namingFonction);
+
    virtual const char *getLabel();
    void setType(menutype type);
    menutype getType();
