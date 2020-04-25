@@ -6,8 +6,8 @@
 namespace CONSOLEMENU_NAMESPACE
 {
 
-MenuitemUpdaterbase::MenuitemUpdaterbase(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type)
-    : Menuitem(menuinstance, menuname, parent, type)
+MenuitemUpdaterbase::MenuitemUpdaterbase(Menubase *menuinstance, const char *menuname, SubMenu *parent)
+    : Menuitem(menuinstance, menuname, parent)
 {
 }
 MenuitemUpdaterbase::MenuitemUpdaterbase() : Menuitem()

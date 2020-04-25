@@ -17,12 +17,11 @@ Menuitem::Menuitem() {}
  * @param menuFonction 
  * @param type 
  */
-Menuitem::Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent, menutype type)
+Menuitem::Menuitem(Menubase *menuinstance, const char *menuname, SubMenu *parent)
 {
     this->_menuinstance = menuinstance;
     this->_mparent = parent;
     this->SetLabel(menuname);
-    this->_mtype = type;
 }
 
 void Menuitem::setMenuInstance(Menubase *mi)
@@ -82,8 +81,12 @@ Menuitem* Menuitem::SetId(ushort id)
 
 const char *Menuitem::getLabel()
 {
+    if (this->_mNamingFonction)
+        return this->_mNamingFonction(this->_mkey);
     return this->_mname;
 }
+
+
 Menuitem *Menuitem::addExit()
 {
     this->flags.Set(menuitemflags::exitemnu, true);
@@ -171,6 +174,12 @@ Menuitem *Menuitem::addCallback(fp_callback3 newcallback)
 Menuitem *Menuitem::addLambda(std::function < void()> func)
 {
    this->_lambdas_const.push_back(func);
+    return this;
+}
+
+Menuitem *Menuitem::SetNamingCallback(fp_namingcallback namingFonction)
+{
+    _mNamingFonction = namingFonction;
     return this;
 }
 

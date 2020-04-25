@@ -278,7 +278,8 @@ private:
         // add exit menu items
         if (!_exitmenuitem)
         {
-            _exitmenuitem = new Menuitem(this, CONSOLEMENU_MENU_EXIT, NULL, menutype::exit);
+            _exitmenuitem = new Menuitem(this, CONSOLEMENU_MENU_EXIT, NULL);
+            _exitmenuitem->setType(menutype::exit);
             try
             {
                 insertMewMenuitem(_exitmenuitem);

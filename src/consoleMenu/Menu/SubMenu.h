@@ -2,7 +2,6 @@
 
 #include "Menubase.h"
 #include "MenuitemUpdater.hpp"
-#include "MenuitemCallback.h"
 // #include <vector>
 // #include "Menu.hpp"
 
@@ -51,7 +50,7 @@ public:
      * else stay in the current menu and wait for another action
      * @return MenuitemCallback* to chain with other configuration for this MenuItem
      */
-    MenuitemCallback *addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc);
+    Menuitem *addMenuitemCallback(const char *label, ushort menukey, fp_callback3 onselectFunc);
 
     /**
      * @brief add a submenu item calling a given function - dynamic labelling
@@ -63,7 +62,7 @@ public:
      * else stay in the current menu and wait for another action
      * @return MenuitemCallback* to chain with other configuration for this MenuItem
        */
-    MenuitemCallback *addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc);
+    Menuitem *addMenuitemCallback(fp_namingcallback namingFunc, ushort menukey, fp_callback3 onselectFunc);
 
     /**
      * @brief add a submenu item calling a given simple function (no params) - static labelling
@@ -74,7 +73,7 @@ public:
      * else stay in the current menu and wait for another action
      * @return MenuitemCallback* to chain with other configuration for this MenuItem
      */
-    MenuitemCallback *addMenuitemCallback(const char *label, fp_callback1 onselectFunc);
+    Menuitem *addMenuitemCallback(const char *label, fp_callback1 onselectFunc);
 
     /**
      * @brief add a submenu item calling a given simple function (no params) - dynamic labelling
@@ -85,7 +84,7 @@ public:
      * else stay in the current menu and wait for another action
      * @return MenuitemUpdaterbase* to chain with other configuration for this MenuItem
      */
-    MenuitemCallback *addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc);
+    Menuitem *addMenuitemCallback(fp_namingcallback namingFunc, fp_callback1 onselectFunc);
 
     /**
  * @brief add a menu item designed for one goal : update a value in a given pointer to a variable.
@@ -100,7 +99,7 @@ public:
     template <typename T>
     MenuitemUpdaterbase *addMenuitemUpdater(const char *label, T *variableToUpdate)
     {
-        MenuitemUpdater<T> *miu = new MenuitemUpdater<T>(this->_menuinstance, label, this, menutype::variableUpdater_i);
+        MenuitemUpdater<T> *miu = new MenuitemUpdater<T>(this->_menuinstance, label, this);
         miu->setVarToUpdate(variableToUpdate);
         miu->setInputTrials(this->_menuinstance->getOptions().badInputRepeats);
         if (this->_menuinstance->addChild(this, miu))
