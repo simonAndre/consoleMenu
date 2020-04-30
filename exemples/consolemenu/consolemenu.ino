@@ -46,7 +46,8 @@ void setup()
 void loop()
 {
     // CheckSerial();
-    _consolemenu->LoopCheckSerial();
+    if(_consolemenu->LoopCheckSerial())
+        Serial.Print("we're out of the menu");
     delay(50);
 }
 

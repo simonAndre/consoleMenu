@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../commontypes.h"
 #if defined(ARDUINO)
+#include <LibPrintf.h>
 #include "Arduino.h"
 #endif
 

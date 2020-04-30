@@ -99,8 +99,11 @@ public:
      * @brief to call in the main loop : listen to an input from the serial UI and react displaying the root menu
      * this method can be implemnted in your code, in this case, call Menu::launchMenu() when you want to display the root menu.
      * currently only implemented for arduino
+     * 
+     * @return true to signal an entry in the menu
+     * @return false no entry in the menu required
      */
-    virtual void LoopCheckSerial() override
+    virtual bool LoopCheckSerial() override
     {
 #if CONSOLEMENU_EMBEDDED_MODE
         if (!this->_isserialmenuative && Serial.available() > 0)
@@ -114,8 +117,10 @@ public:
          */
             // Serial.println("menu exited");
             this->_isserialmenuative = false;
+            return true;
         }
 #endif
+        return false;
     }
 
     /**

@@ -69,7 +69,7 @@ void Menubase::launchMenu()
     throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
 }
 
-void Menubase::LoopCheckSerial()
+bool Menubase::LoopCheckSerial()
 {
     throw std::runtime_error(CONSOLEMENU_NOTIMPLEMENTED);
 }

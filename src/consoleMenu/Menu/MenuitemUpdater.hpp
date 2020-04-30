@@ -78,7 +78,6 @@ public:
  * @brief display the menu-item current value, if variableToUpdate is set (for updaters menu-items)
  * 
  * @param displaycb : display callback
- * @param addbrackets : true to surround with brackets
  */
     virtual void displayCurrentValue() override
     {

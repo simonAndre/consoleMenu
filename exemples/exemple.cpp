@@ -2,6 +2,7 @@
 #include <array>
 #include <consoleMenu.h>
 #include <typeinfo>
+
 using namespace std;
 
 //prototypes
@@ -23,6 +24,7 @@ bool SetTimeout();
 
 // variables
 char staticString[30];
+char tempbuff[50];
 int int1 = 1234;
 float float1 = 5688.5567;
 bool bool1;
@@ -54,6 +56,12 @@ enum MyMenuKeys
     int1updater
 };
 
+const char *dynlabel_intvalue()
+{
+    snprintf(tempbuff, sizeof(tempbuff), "(current=%i)", _intvalue);
+    return (const char *)tempbuff;
+}
+
 void SetupMenu()
 {
     mymenu = new Menu<21>(); //declare a menu sized for 19 menu-items
@@ -74,7 +82,7 @@ void SetupMenu()
     // submenu definition - method 2 : from the global menu instance
     SubMenu *submenu2 = mymenu->addSubMenu("submenu inputs w updaters")->addCallbackToChilds(addedlog3);
     // SubMenu *submenu2 = root->addSubMenu("submenu inputs w updaters")->addCallbackToChilds(addedlog3);
-    root->addMenuitemCallback("simple menu and exit", simpleMenu)->addExit();                          // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
+    root->addMenuitemCallback("simple menu and exit", simpleMenu)->addExit(); // simpleMenuis a simple callback without parameter, function is : [bool simpleMenu();]
     // callback with menu name passed as parameter, see function menuParamName and callback chained
     root->addMenuitemCallback("consoleMenu version", getVersionMenu)->addCallback(addedlog)->addCallback(addedlog2);
 
@@ -100,7 +108,8 @@ void SetupMenu()
     submenu2->addMenuitemUpdater("change float1", &float1);
     submenu2->addMenuitemUpdater("change bool1", &bool1)->addCallback(addedlog)->addCallback(addedlog2);
 
-    submenu2->addMenuitem()->SetLabel("int1=50")->addLambda([]() { _intvalue = 50; })->addCallback(DisplayIntValue);
+    submenu2->addMenuitem()->SetLabel("int1=50")->addLambda([]() { _intvalue = 50; })->SetDynLabel(dynlabel_intvalue, true)->addCallback(DisplayIntValue);
+
     submenu2->addMenuitem()->SetLabel("int1=100")->addLambda([]() { _intvalue = 100; })->addCallback(DisplayIntValue);
 
     if (miu_changint)
@@ -116,33 +125,11 @@ void SetupMenu()
 /***********   main   ******************/
 int main()
 {
-    // IoHelpers::IOdisplayG<const char *>("popo");
-    // IoHelpers::IOdisplayG<int>(54);
-    // auto _displayCallback = (consoleMenu033::fp_IOdisplay)IoHelpers::IOdisplayG<const char *>;
-    // const char *cs = "coucou";
-    // _displayCallback(cs);
-    // _displayCallback("mlkmkl\n");
-
-    // std::array<Menuitem, 20> itemarray;
-    // Menuitem newmi(&m, "testaddroot", 1, NULL, menutype::rootmenu);
-
-    // itemarray[3] = newmi;
-    // std::cout
-    //     << "size of Menuitem: " << sizeof(Menuitem) << '\n';
-    // std::cout << "size of itemarray: " << itemarray.size() << '\n';
-    // std::cout << "max_size of itemarray: " << itemarray.max_size() << '\n';
 
     cout
         << "\n\n";
     SetupMenu();
     cout << "size menu : " << mymenu->size() << '\n';
-
-    // for (size_t i = 1; i < 10; i++)
-    // {
-    //     cout << i << " -> " << m.getById(i)->mname << '\n';
-    // }
-
-    // m.displayMenu(0);
 
     // display the root menu
     mymenu->launchMenu();

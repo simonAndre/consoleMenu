@@ -35,7 +35,7 @@ SubMenu *Menuitem::getParent()
 }
 Menuitem *Menuitem::SetParent(SubMenu *parent)
 {
-    if (!this->flags.Get(menuitemflags::menuparentset) || this->getType()== menutype::back)
+    if (!this->flags.Get(menuitemflags::menuparentset) || this->getType() == menutype::back)
     {
         this->_mparent = parent;
         this->flags.Set(menuitemflags::menuparentset, true);
@@ -44,10 +44,10 @@ Menuitem *Menuitem::SetParent(SubMenu *parent)
     else
         throw std::runtime_error("SetParent can be called only once per menu-item");
 }
-    
-Menuitem* Menuitem::SetLabel(const char *name)
+
+Menuitem *Menuitem::SetLabel(const char *name)
 {
-    this->_mname =name;
+    this->_mname = name;
     return this;
 }
 
@@ -67,7 +67,7 @@ ushort Menuitem::getId()
 {
     return this->_mid;
 }
-Menuitem* Menuitem::SetId(ushort id)
+Menuitem *Menuitem::SetId(ushort id)
 {
     if (!this->flags.Get(menuitemflags::menuidset))
     {
@@ -81,11 +81,30 @@ Menuitem* Menuitem::SetId(ushort id)
 
 const char *Menuitem::getLabel()
 {
+    if (this->_mNamingLambda)
+    {
+        if (this->flags.Get(menuitemflags::addToLabel))
+        {
+            _labelappendStr.assign(this->_mname);
+            _labelappendStr.append(this->_mNamingLambda());
+            return _labelappendStr.c_str();
+        }
+        else
+            return this->_mNamingLambda();
+    }
     if (this->_mNamingFonction)
-        return this->_mNamingFonction(this->_mkey);
+    {
+        if (this->flags.Get(menuitemflags::addToLabel))
+        {
+            _labelappendStr.assign(this->_mname);
+            _labelappendStr.append(this->_mNamingFonction(this->_mkey));
+            return _labelappendStr.c_str();
+        }
+        else
+            return this->_mNamingFonction(this->_mkey);
+    }
     return this->_mname;
 }
-
 
 Menuitem *Menuitem::addExit()
 {
@@ -95,7 +114,7 @@ Menuitem *Menuitem::addExit()
 
 Menuitem *Menuitem::setMenuKey(ushort menukey)
 {
-    if (!this->flags.Get(menuitemflags::menukeyset))       
+    if (!this->flags.Get(menuitemflags::menukeyset))
     {
         this->_menuinstance->addMenuKey(menukey, this->getId());
         this->_mkey = menukey;
@@ -132,7 +151,7 @@ SelectActionResult Menuitem::selectAction()
 
     res.exitRequested = this->flags.Get(menuitemflags::exitemnu);
 
-//execute the lambdas
+    //execute the lambdas
     std::vector<std::function<void()>>::const_iterator it_lambda;
     for (it_lambda = _lambdas_const.begin(); it_lambda != _lambdas_const.end(); ++it_lambda)
     {
@@ -171,16 +190,25 @@ Menuitem *Menuitem::addCallback(fp_callback3 newcallback)
     return this;
 }
 
-Menuitem *Menuitem::addLambda(std::function < void()> func)
+Menuitem *Menuitem::addLambda(std::function<void()> func)
 {
-   this->_lambdas_const.push_back(func);
+    this->_lambdas_const.push_back(func);
     return this;
 }
 
-Menuitem *Menuitem::SetNamingCallback(fp_namingcallback namingFonction)
+Menuitem *Menuitem::SetDynLabel(std::function<const char *()> labellingfunc, bool addToLabel)
 {
+    this->flags.Set(menuitemflags::addToLabel, addToLabel);
+    _mNamingLambda = labellingfunc;
+    return this;
+}
+
+Menuitem *Menuitem::SetNamingCallback(fp_namingcallback namingFonction, bool addToLabel)
+{
+    this->flags.Set(menuitemflags::addToLabel, addToLabel);
     _mNamingFonction = namingFonction;
     return this;
 }
+
 
 } // namespace CONSOLEMENU_NAMESPACE
