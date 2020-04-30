@@ -54,7 +54,7 @@ public:
 
     virtual void launchMenu();
 
-    virtual void LoopCheckSerial();
+    virtual bool LoopCheckSerial();
 
     virtual void addMenuKey(ushort menukey, ushort menuid);
 };
