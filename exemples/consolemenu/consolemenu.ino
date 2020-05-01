@@ -47,7 +47,7 @@ void loop()
 {
     // CheckSerial();
     if(_consolemenu->LoopCheckSerial())
-        Serial.Print("we're out of the menu");
+        Serial.print("we're out of the menu");
     delay(50);
 }
 

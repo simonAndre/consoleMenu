@@ -3,7 +3,7 @@
 
 (c) Simon ANDRE, 2019
 current version : 0.6
-
+**WIP more modifications to come, some method will become obsolete, use with care before 0.7**
 
 target : any environment : embedded, linux or windows.
 mainly done for embedded, its main purpose is to be simple and very lightweight with a small memory footprint.
@@ -127,8 +127,12 @@ submenu3->addMenuitemCallback(switchMenuDisplay, (ushort)MyMenuKeys::switchmenu2
 submenu2->addMenuitemUpdater("change str1", (char *)staticString, sizeof(staticString));    // example with a string
 submenu2->addMenuitemUpdater("change int1", &int1);     // example with an int
 submenu2->addMenuitemUpdater("change float1", &float1);     // example with a float
-submenu2->addMenuitemUpdater("change bool1", &bool1);      // example with a bool (rendered as ON/OFF or Y/N..)
-
+submenu2->addMenuitemUpdater("change bool1", &bool1);     
+// example with a bool (rendered as ON/OFF or Y/N..) followed by a call to 2 callbacks
+submenu2->addMenuitemUpdater("change bool1", &bool1)->addCallback(addedlog)->addCallback(addedlog2);  
+// use of lambda function as callback (possible to capture the context) and déynamic labelling
+submenu2->addMenuitem()->SetLabel("int1=50")->addLambda([]() { _intvalue = 50; })->SetDynLabel(dynlabel_intvalue, true)->addCallback(DisplayIntValue);
+  
 // and display the root menu (can be call later, in the main loop for example)
 mymenu->launchMenu();
 ```
