@@ -109,7 +109,6 @@ void SetupMenu()
     submenu2->addMenuitemUpdater("change bool1", &bool1)->addCallback(addedlog)->addCallback(addedlog2);
 
     submenu2->addMenuitem()->SetLabel("int1=50")->addLambda([]() { _intvalue = 50; })->SetDynLabel(dynlabel_intvalue, true)->addCallback(DisplayIntValue);
-
     submenu2->addMenuitem()->SetLabel("int1=100")->addLambda([]() { _intvalue = 100; })->addCallback(DisplayIntValue);
 
     if (miu_changint)
