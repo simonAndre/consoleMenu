@@ -330,6 +330,18 @@ prototypes :
   bool addMenuitemUpdater(const char *label, char *variableToUpdate, size_t stringsize);
 ```
 
+## roadmap
+
++ only use lambda for callbacks
++ migrate IOHelpers to printf library
++ use SanLogger
++ refactor with smart pointers and better polymorphisme for the items (get rid of consoleMenuBase)
++ use only fluent declaration from menuItem
+  
+
+
+
+
 
 
 ## Licence
