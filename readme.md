@@ -1,4 +1,4 @@
-# consoleMenu, a simple console UI hierarchy menu
+# consoleMenu, a simple yet powerfull console UI hierarchy menu for embedded and more
 
 
 (c) Simon ANDRE, 2019
