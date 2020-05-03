@@ -1,6 +1,5 @@
-#include "src/consoleMenu/Menu/SubMenu.h"
-// #include "src/consoleMenu/Menu/Menuitem.h"
-#include "src/consoleMenu/Menu/Menubase.h"
+#include "Menu/SubMenu.h"
+#include "Menu/Menubase.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {

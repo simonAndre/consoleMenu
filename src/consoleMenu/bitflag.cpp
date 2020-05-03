@@ -1,4 +1,4 @@
-#include "src/consoleMenu/bitflag.h"
+#include "bitflag.h"
 
 namespace CONSOLEMENU_NAMESPACE
 {
